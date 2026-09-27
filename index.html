@@ -531,7 +531,31 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 
     <div class="gate-err" id="gateErr"></div>
 
+    <div style="text-align:center;margin-top:14px">
+      <a href="#" id="gate-free-link" style="font-size:12.5px;color:#C9A84C;text-decoration:underline" onclick="gateContinueFree();return false;">Continue to Free Version &rarr;</a>
+    </div>
+
     <div class="gate-footer">2025 Advanced Athletic Medicine · Throwers Mafia · Individual Use Only</div>
+  </div>
+</div>
+
+<div id="freeDisclaimerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:700;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:8px;width:min(420px,90vw);max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.3);padding:28px 24px;text-align:left">
+    <div style="color:#1C1C1E;font-size:18px;font-weight:700;margin-bottom:10px">Before You Continue</div>
+    <div style="color:#4A4A52;font-size:13px;line-height:1.7">
+      The free version of the Arm Care Manual is an educational and organizational tool. It offers general arm care information, exercise guidance, and program education for baseball athletes, parents, and coaches.
+      <br><br>
+      It is <strong>not medical advice</strong> and does not replace evaluation, diagnosis, or treatment by a licensed athletic trainer or physician. If an athlete is experiencing pain or has a suspected injury, they should be seen by a qualified medical provider.
+      <br><br>
+      No account is required to use the free version, and no personal or health information is collected here.
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:8px;margin:18px 0 4px">
+      <input type="checkbox" id="free-disclaimer-check" style="width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:#C9A84C">
+      <label for="free-disclaimer-check" style="font-size:12.5px;line-height:1.5;color:#4A4A52">I understand and acknowledge the above.</label>
+    </div>
+    <div id="freeDisclaimerErr" style="color:#C0392B;font-size:12px;margin-top:6px"></div>
+    <button class="gate-btn" style="margin-top:14px" onclick="acknowledgeFreeDisclaimer()">Continue</button>
+    <div style="text-align:center;margin-top:10px"><a href="#" style="font-size:12px;color:#8A9BB0" onclick="closeFreeDisclaimerModal();return false;">Cancel</a></div>
   </div>
 </div>
 
@@ -609,7 +633,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
     <div id="sidebar">
       <div class="nav-section"><div class="nav-label">Home</div><div class="nav-item active" onclick="showSection('home')">Home</div></div>
       <div class="nav-section"><div class="nav-label">Account</div>
-        <div class="nav-item" id="nav-account-item" onclick="showSection('account')">Log In / Sign Up</div>
+        <div class="nav-item" id="nav-account-item" onclick="navGoAccount()">Log In / Sign Up</div>
       </div>
       <div class="nav-section">
         <div class="nav-label toggleable" onclick="toggleNavGroup('foundation')">Foundation<span class="nav-chevron">&#9656;</span></div>
@@ -632,14 +656,14 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
         <div class="nav-item" onclick="showSection('twoout')">2-Out Drill</div>
         </div>
       </div>
-      <div class="nav-section">
+      <div class="nav-section" data-tier-gate="1">
         <div class="nav-label toggleable" onclick="toggleNavGroup('tools')">Tools<span class="nav-chevron">&#9656;</span></div>
         <div class="nav-group-items" id="navgrp-tools">
         <div class="nav-item" onclick="showSection('readiness')">Arm Readiness Check</div>
         <div class="nav-item" onclick="showSection('tracker')">Volume Tracker</div>
         </div>
       </div>
-      <div class="nav-section">
+      <div class="nav-section" data-tier-gate="1">
         <div class="nav-label toggleable" onclick="toggleNavGroup('programs')">Programs<span class="nav-chevron">&#9656;</span></div>
         <div class="nav-group-items" id="navgrp-programs">
         <div class="nav-item" onclick="showSection('throwingorder')">Daily Throwing Order</div>
@@ -659,13 +683,13 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
         <div class="nav-item" onclick="showSection('annual')">Annual Planning</div>
         </div>
       </div>
-      <div class="nav-section">
+      <div class="nav-section" data-tier-gate="1">
         <div class="nav-label toggleable" onclick="toggleNavGroup('coaches')">Coaches Tools<span class="nav-chevron">&#9656;</span></div>
         <div class="nav-group-items" id="navgrp-coaches">
         <div class="nav-item" onclick="showSection('coaches')">Throw Exposure Board</div>
         </div>
       </div>
-      <div class="nav-section">
+      <div class="nav-section" data-tier-gate="1">
         <div class="nav-label toggleable" onclick="toggleNavGroup('clinical')">Clinical (Staff Only)<span class="nav-chevron">&#9656;</span></div>
         <div class="nav-group-items" id="navgrp-clinical">
         <div class="nav-item" onclick="showSection('throwbuilder')">Throwing Program Builder</div>
@@ -776,6 +800,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
           <div class="home-card" onclick="showSection('scapular')"><div class="icon">&#9898;</div><div class="name">Scapular Control</div><div class="desc">Blackburns, Kendalls, Banded Y</div><div class="tag">Arm Care</div></div>
           <div class="home-card" onclick="showSection('twoout')"><div class="icon">&#9918;</div><div class="name">2-Out Drill</div><div class="desc">30-45 sec in-game ROM drill</div><div class="tag">In-Game</div></div>
         </div>
+        <div data-tier-gate="1">
         <div class="home-group-label">Programs</div>
         <div class="home-grid">
           <div class="home-card" onclick="showSection('throwingorder')"><div class="icon">&#9889;</div><div class="name">Daily Throwing Order</div><div class="desc">The 7-step sequence every session follows</div><div class="tag">Daily</div></div>
@@ -789,6 +814,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
         <div class="home-grid">
           <div class="home-card" onclick="showSection('readiness')"><div class="icon">&#128221;</div><div class="name">Arm Readiness Check</div><div class="desc">Post-throw check-in and history</div><div class="tag">Tool</div></div>
           <div class="home-card" onclick="showSection('tracker')"><div class="icon">&#128202;</div><div class="name">Volume Tracker</div><div class="desc">Log sessions and weekly totals</div><div class="tag">Tool</div></div>
+        </div>
         </div>
         <div style="height:40px"></div>
       </div>
@@ -2282,9 +2308,63 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 
 <script>
 function gateUnlockApp() {
+  sessionStorage.removeItem('aamGuestMode');
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  applyGuestRestrictions(false);
   setTimeout(function(){ try{initTools();}catch(e){} }, 100);
+}
+
+function gateContinueFree() {
+  if (localStorage.getItem('aamFreeDisclaimerAck') === 'yes') {
+    enterGuestMode();
+  } else {
+    document.getElementById('freeDisclaimerModal').style.display = 'flex';
+  }
+}
+
+function closeFreeDisclaimerModal() {
+  document.getElementById('freeDisclaimerModal').style.display = 'none';
+}
+
+function acknowledgeFreeDisclaimer() {
+  var err = document.getElementById('freeDisclaimerErr');
+  if (!document.getElementById('free-disclaimer-check').checked) {
+    err.textContent = 'Please check the box to continue.';
+    return;
+  }
+  err.textContent = '';
+  localStorage.setItem('aamFreeDisclaimerAck', 'yes');
+  document.getElementById('freeDisclaimerModal').style.display = 'none';
+  enterGuestMode();
+}
+
+function enterGuestMode() {
+  sessionStorage.setItem('aamGuestMode', '1');
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  applyGuestRestrictions(true);
+  showSection('home');
+  setTimeout(function(){ try{initTools();}catch(e){} }, 100);
+}
+
+function applyGuestRestrictions(isGuest) {
+  document.querySelectorAll('[data-tier-gate]').forEach(function(el) {
+    el.style.display = isGuest ? 'none' : '';
+  });
+  var navItem = document.getElementById('nav-account-item');
+  if (navItem && isGuest) navItem.textContent = 'Log In / Sign Up';
+}
+
+function navGoAccount() {
+  if (sessionStorage.getItem('aamGuestMode') === '1') {
+    sessionStorage.removeItem('aamGuestMode');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('gate').style.display = 'flex';
+    gateSwitchTab('login');
+  } else {
+    showSection('account');
+  }
 }
 
 function gateSwitchTab(tab) {
@@ -2444,6 +2524,8 @@ async function gateSignUp() {
   var res = await sb.auth.getSession();
   if (res.data && res.data.session && res.data.session.user) {
     gateUnlockApp();
+  } else if (sessionStorage.getItem('aamGuestMode') === '1') {
+    enterGuestMode();
   }
 })();
 
@@ -3104,6 +3186,12 @@ async function renderHomeSchedule() {
   var list = document.getElementById('hsc-list');
   var hdrTitle = document.getElementById('hsc-hdr-title');
   if (!card || !list) return;
+
+  if (sessionStorage.getItem('aamGuestMode') === '1') {
+    card.style.display = 'none';
+    if (spacer) spacer.style.display = 'none';
+    return;
+  }
 
   var sections = null;
   var sourceLabel = '';
@@ -4486,6 +4574,8 @@ async function acctLogOut() {
 }
 
 function acctRenderLoggedIn(user) {
+  sessionStorage.removeItem('aamGuestMode');
+  applyGuestRestrictions(false);
   var name = (user.user_metadata && user.user_metadata.full_name) || user.email;
   var role = (user.user_metadata && user.user_metadata.role) || 'unknown';
   document.getElementById('acct-name-display').textContent = name;
