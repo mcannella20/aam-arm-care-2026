@@ -534,6 +534,14 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
     <div style="text-align:center;margin-top:14px">
       <a href="#" id="gate-free-link" style="font-size:12.5px;color:#C9A84C;text-decoration:underline" onclick="gateContinueFree();return false;">Continue to Free Version &rarr;</a>
     </div>
+    <div style="text-align:center;margin-top:8px">
+      <a href="#" id="gate-tier2-link" style="font-size:11.5px;color:#8A9BB0;text-decoration:underline" onclick="toggleTier2Input();return false;">Have an access code?</a>
+    </div>
+    <div id="gate-tier2-box" style="display:none;margin-top:10px;text-align:left">
+      <input type="text" id="gate-tier2-code" placeholder="Access code" autocomplete="off" style="width:100%;box-sizing:border-box;background:#0F1E35;border:1px solid #2A4568;color:#fff;padding:10px;border-radius:3px;text-align:center;letter-spacing:2px;text-transform:uppercase;font-family:Arial,sans-serif">
+      <button class="gate-btn" style="margin-top:8px" onclick="submitTier2Code()">Unlock</button>
+      <div id="gate-tier2-err" style="color:#E0796C;font-size:12px;margin-top:6px;text-align:center"></div>
+    </div>
 
     <div class="gate-footer">2025 Advanced Athletic Medicine · Throwers Mafia · Individual Use Only</div>
   </div>
@@ -689,7 +697,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
         <div class="nav-item" onclick="showSection('coaches')">Throw Exposure Board</div>
         </div>
       </div>
-      <div class="nav-section" data-tier-gate="1">
+      <div class="nav-section" data-clinical-gate="1">
         <div class="nav-label toggleable" onclick="toggleNavGroup('clinical')">Clinical (Staff Only)<span class="nav-chevron">&#9656;</span></div>
         <div class="nav-group-items" id="navgrp-clinical">
         <div class="nav-item" onclick="showSection('throwbuilder')">Throwing Program Builder</div>
@@ -2315,9 +2323,35 @@ function gateUnlockApp() {
   setTimeout(function(){ try{initTools();}catch(e){} }, 100);
 }
 
+var TIER2_CODE = 'AAMFULL2026'; // access code for everything except Clinical (Staff Only) - change as needed
+var pendingGuestMode = 'tier1';
+
 function gateContinueFree() {
+  pendingGuestMode = 'tier1';
   if (localStorage.getItem('aamFreeDisclaimerAck') === 'yes') {
-    enterGuestMode();
+    enterGuestMode(pendingGuestMode);
+  } else {
+    document.getElementById('freeDisclaimerModal').style.display = 'flex';
+  }
+}
+
+function toggleTier2Input() {
+  var box = document.getElementById('gate-tier2-box');
+  box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+}
+
+function submitTier2Code() {
+  var v = document.getElementById('gate-tier2-code').value.trim().toUpperCase();
+  var err = document.getElementById('gate-tier2-err');
+  if (v !== TIER2_CODE) {
+    err.textContent = 'Incorrect code.';
+    return;
+  }
+  err.textContent = '';
+  document.getElementById('gate-tier2-code').value = '';
+  pendingGuestMode = 'tier2';
+  if (localStorage.getItem('aamFreeDisclaimerAck') === 'yes') {
+    enterGuestMode(pendingGuestMode);
   } else {
     document.getElementById('freeDisclaimerModal').style.display = 'flex';
   }
@@ -2336,28 +2370,36 @@ function acknowledgeFreeDisclaimer() {
   err.textContent = '';
   localStorage.setItem('aamFreeDisclaimerAck', 'yes');
   document.getElementById('freeDisclaimerModal').style.display = 'none';
-  enterGuestMode();
+  enterGuestMode(pendingGuestMode);
 }
 
-function enterGuestMode() {
-  sessionStorage.setItem('aamGuestMode', '1');
+function enterGuestMode(mode) {
+  mode = mode || 'tier1';
+  sessionStorage.setItem('aamGuestMode', mode);
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  applyGuestRestrictions(true);
+  applyGuestRestrictions(mode);
   showSection('home');
   setTimeout(function(){ try{initTools();}catch(e){} }, 100);
 }
 
-function applyGuestRestrictions(isGuest) {
+function applyGuestRestrictions(mode) {
+  // mode: falsy = full access, 'tier1' = free only (Foundation/Exercise Library/Guidelines/Reference),
+  // 'tier2' = everything except Clinical (Staff Only)
+  var hideTierGate = (mode === 'tier1');
   document.querySelectorAll('[data-tier-gate]').forEach(function(el) {
-    el.style.display = isGuest ? 'none' : '';
+    el.style.display = hideTierGate ? 'none' : '';
+  });
+  var hideClinical = (mode === 'tier1' || mode === 'tier2');
+  document.querySelectorAll('[data-clinical-gate]').forEach(function(el) {
+    el.style.display = hideClinical ? 'none' : '';
   });
   var navItem = document.getElementById('nav-account-item');
-  if (navItem && isGuest) navItem.textContent = 'Log In / Sign Up';
+  if (navItem && mode) navItem.textContent = 'Log In / Sign Up';
 }
 
 function navGoAccount() {
-  if (sessionStorage.getItem('aamGuestMode') === '1') {
+  if (sessionStorage.getItem('aamGuestMode')) {
     sessionStorage.removeItem('aamGuestMode');
     document.getElementById('app').style.display = 'none';
     document.getElementById('gate').style.display = 'flex';
@@ -2524,8 +2566,8 @@ async function gateSignUp() {
   var res = await sb.auth.getSession();
   if (res.data && res.data.session && res.data.session.user) {
     gateUnlockApp();
-  } else if (sessionStorage.getItem('aamGuestMode') === '1') {
-    enterGuestMode();
+  } else if (sessionStorage.getItem('aamGuestMode')) {
+    enterGuestMode(sessionStorage.getItem('aamGuestMode'));
   }
 })();
 
@@ -3187,7 +3229,7 @@ async function renderHomeSchedule() {
   var hdrTitle = document.getElementById('hsc-hdr-title');
   if (!card || !list) return;
 
-  if (sessionStorage.getItem('aamGuestMode') === '1') {
+  if (sessionStorage.getItem('aamGuestMode')) {
     card.style.display = 'none';
     if (spacer) spacer.style.display = 'none';
     return;
