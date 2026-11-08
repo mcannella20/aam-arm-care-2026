@@ -299,6 +299,26 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 .clin-gate-sub { color: #8A9BB0; font-size: 13px; margin-bottom: 20px; line-height: 1.6; }
 .clin-gate input { width: 100%; background: rgba(255,255,255,0.08); border: 2px solid #2A4568; color: #fff; font-size: 18px; letter-spacing: 4px; padding: 10px; text-align: center; border-radius: 3px; margin-bottom: 12px; outline: none; font-family: Arial, sans-serif; }
 .clin-gate input:focus { border-color: #C9A84C; }
+.aam-lock-note { color: #8A9BB0; font-size: 12px; margin-top: 14px; line-height: 1.6; }
+.aam-lock-note a { color: #C9A84C; cursor: pointer; text-decoration: underline; }
+.aam-loading .gate-btn { opacity: .6; pointer-events: none; }
+#acct-status-banner { margin: 18px 0; padding: 14px 16px; border-radius: 6px; font-size: 13.5px; line-height: 1.6; }
+#acct-status-banner.pending { background: #FDF8DC; border-left: 4px solid #C9A84C; color: #4A4A52; }
+#acct-status-banner.paused { background: #FBEAE7; border-left: 4px solid #C0392B; color: #4A4A52; }
+.aam-mem-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.aam-mem-filter { background: #fff; border: 1px solid #C9CFD8; color: #1B2A4A; font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 14px; cursor: pointer; }
+.aam-mem-filter.active { background: #1B2A4A; border-color: #1B2A4A; color: #C9A84C; }
+.aam-mem-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; background: #fff; border: 1px solid #E2E5EA; border-left: 4px solid #C9CFD8; border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
+.aam-mem-row.pending { border-left-color: #C9A84C; }
+.aam-mem-row.active { border-left-color: #2E8B57; }
+.aam-mem-row.paused { border-left-color: #C0392B; }
+.aam-mem-name { font-weight: 700; color: #1B2A4A; font-size: 14px; }
+.aam-mem-meta { color: #7A7A85; font-size: 12px; margin-top: 2px; word-break: break-all; }
+.aam-mem-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.aam-mem-actions select { font-size: 12px; padding: 5px 6px; border: 1px solid #C9CFD8; border-radius: 4px; }
+.aam-mem-btn { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; }
+.aam-mem-btn.ok { background: #2E8B57; color: #fff; }
+.aam-mem-btn.warn { background: #fff; color: #C0392B; border: 1px solid #C0392B; }
 .clin-err { color: #F08070; font-size: 12px; min-height: 16px; margin-top: 8px; }
 .day-check-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
 .day-check { padding: 8px 12px; border: 1px solid #E8E4DC; border-radius: 4px; font-size: 12px; font-weight: 700; color: #4A4A52; cursor: pointer; background: #fff; }
@@ -494,6 +514,18 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
       </div>
       <button class="gate-btn" id="gate-login-btn" onclick="gateLogIn()">Log In</button>
       <div style="text-align:right;margin-top:10px"><a href="#" style="font-size:12px;color:#8A9BB0" onclick="gateShowReset();return false;">Forgot password?</a></div>
+      <div style="text-align:center;margin-top:14px"><a href="#" style="font-size:12.5px;color:#C9A84C;text-decoration:underline" onclick="gateShowCodeLogin();return false;">Email me a sign-in code instead</a></div>
+    </div>
+
+    <div id="gate-code-form" style="display:none">
+      <div class="clin-gate-sub" style="margin-bottom:16px">No password needed. We will email a sign-in code to the address on your AAM account.</div>
+      <div class="acct-field" style="text-align:left"><label>Email</label><input type="email" id="gate-code-email" autocomplete="email"></div>
+      <button class="gate-btn" id="gate-code-send-btn" onclick="gateSendLoginCode()">Email Me a Code</button>
+      <div id="gate-code-step2" style="display:none;margin-top:16px">
+        <div class="acct-field" style="text-align:left"><label>Sign-In Code</label><input type="text" id="gate-code-token" inputmode="numeric" autocomplete="one-time-code" maxlength="10" style="letter-spacing:4px;text-align:center"></div>
+        <button class="gate-btn" id="gate-code-verify-btn" onclick="gateVerifyLoginCode()">Log In</button>
+      </div>
+      <div style="text-align:center;margin-top:10px"><a href="#" style="font-size:12px;color:#8A9BB0" onclick="gateSwitchTab('login');return false;">Back to password log in</a></div>
     </div>
 
     <div id="gate-signup-form" style="display:none">
@@ -998,327 +1030,94 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 
       <!-- DAILY THROWING ORDER -->
       <div class="section" id="sec-throwingorder">
-        <div class="sec-eyebrow">Programs</div>
-        <h1 class="sec-title">Daily Throwing Order</h1>
-        <div class="gold-bar"></div>
-        <div class="callout callout-navy">Structure matters. The order in which an athlete prepares to throw is not arbitrary - it reflects a deliberate progression from low-demand to high-demand activity. Skipping steps or rushing through preparation removes the protective effect that the sequence is designed to provide.</div>
-
-        <div style="margin-top:20px">
-          <div class="order-item">
-            <div class="order-num">1</div>
-            <div>
-              <div class="order-title">Soft Tissue Work</div>
-              <div class="order-desc">Foam rolling and soft tissue preparation. Goal: increase tissue extensibility, improve blood flow, and prepare the body for movement. Move slowly and pause on areas of restriction rather than rolling quickly over them. <em style="color:#7A7A85">~5-8 minutes</em></div>
-            </div>
-          </div>
-          <div class="order-item">
-            <div class="order-num">2</div>
-            <div>
-              <div class="order-title">Mobility and Correctives</div>
-              <div class="order-desc">Targeted mobility and corrective exercises addressing the specific ranges of motion the throwing athlete needs most - thoracic spine rotation, shoulder mobility, hip flexibility, and individual movement restrictions. <em style="color:#7A7A85">~5-8 minutes</em></div>
-            </div>
-          </div>
-          <div class="order-item">
-            <div class="order-num">3</div>
-            <div>
-              <div class="order-title">Dynamic Warm-Up</div>
-              <div class="order-desc">Elevates heart rate, increases body temperature, and transitions the athlete to ready for athletic movement. Reinforces hip rotation, trunk separation, deceleration, and weight transfer - the movement patterns most relevant to throwing. A proper dynamic warm-up leaves the athlete slightly warm and moving well before any throwing begins. <em style="color:#7A7A85">~8-10 minutes</em></div>
-            </div>
-          </div>
-          <div class="order-item">
-            <div class="order-num">4</div>
-            <div>
-              <div class="order-title">Movement Pattern Prep</div>
-              <div class="order-desc">Bridges the gap between general warm-up and throwing-specific activity. Reinforces position-specific patterns - weight transfer, hip-to-shoulder separation, deceleration mechanics. Goal: make the first throw of the day feel like the tenth. <em style="color:#7A7A85">~3-5 minutes</em></div>
-            </div>
-          </div>
-          <div class="order-item">
-            <div class="order-num">5</div>
-            <div>
-              <div class="order-title">J-Band Routine</div>
-              <div class="order-desc">Activates the specific muscle groups responsible for throwing - rotator cuff, scapular stabilizers, elbow flexors and extensors, forearm musculature. Volume is intentionally low. Goal is activation and priming - not fatigue. One set of eight reps is enough. <em style="color:#7A7A85">~5 minutes</em></div>
-            </div>
-          </div>
-          <div class="order-item">
-            <div class="order-num">6</div>
-            <div>
-              <div class="order-title">Plyo Prep</div>
-              <div class="order-desc">When prescribed, serves as the final bridge between activation and live throwing. Plyometric throwing movements introduce high-velocity neuromuscular demands in a controlled context. <strong>Not every athlete will have this - it must be individually prescribed.</strong> Never self-directed without provider guidance. <em style="color:#7A7A85">~3-5 minutes when prescribed</em></div>
-            </div>
-          </div>
-          <div class="order-item">
-            <div class="order-num">7</div>
-            <div>
-              <div class="order-title">Throwing Schedule</div>
-              <div class="order-desc">With preparation complete, execute the day's prescribed throwing exactly as written. Volume, distance, and intent are all prescribed for a reason. Deviating from the plan - adding throws, increasing intent, extending the session - undermines the structure the entire program is built on. <em style="color:#7A7A85">As prescribed</em></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="h2">Short Box</div>
-        <div class="prose"><p>A short box is controlled work with a specific purpose - it is not an opportunity to throw hard. It is a dedicated opportunity to work on mechanical refinement, release point consistency, and pitch execution without the full physical demand of mound work.</p>
-        <p>The short box exists because mechanical work done at full intensity is often mechanical work that cannot be evaluated clearly. At 70-85% intent, the feedback loop opens - allowing the pitcher to feel movements, make adjustments, and repeat patterns in a lower-stress environment.</p></div>
-        <div class="sb-card">
-          <div class="sb-item"><div class="sb-lbl">Distance</div><div class="sb-val">45-50 ft</div></div>
-          <div class="sb-item"><div class="sb-lbl">Surface</div><div class="sb-val" style="font-size:16px">Mound or Slope</div></div>
-          <div class="sb-item"><div class="sb-lbl">Intensity</div><div class="sb-val">70-85%</div><div class="sb-note">Not max effort</div></div>
-          <div class="sb-item"><div class="sb-lbl">Volume</div><div class="sb-val" style="font-size:16px">Low to Mod</div></div>
-        </div>
-        <div class="callout callout-gold">The temptation to turn a short box day into a bullpen because the arm feels good should always be resisted. Its value is in what it is - not what it could become if intensity was added.</div>
-      </div>
+  <div class="sec-eyebrow">Programs</div>
+  <h1 class="sec-title">Daily Throwing Order</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">AAM Members</div>
+    <div class="clin-gate-sub">This section is part of the full AAM program. Log in to your approved AAM account, or enter your access code.</div>
+    <input type="text" id="aam-in-throwingorder" placeholder="ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamTier2FromShell('throwingorder')">
+    <button class="gate-btn" onclick="aamTier2FromShell('throwingorder')">Unlock</button>
+    <div class="clin-err" id="aam-err-throwingorder"></div>
+    <div class="aam-lock-note">Want to work with AAM directly? <a onclick="showSection('contact')">Contact us</a>.</div>
+  </div>
+</div>
 
       <!-- ARM CARE PRINCIPLES -->
       <div class="section" id="sec-principles">
-        <div class="sec-eyebrow">Foundation</div>
-        <h1 class="sec-title">Arm Care Principles</h1>
-        <div class="gold-bar"></div>
-
-        <div class="h2">Pre-Throw Preparation</div>
-        <div class="prose">
-          <p>Baseball is a game rooted in routine. While routine can support confidence, preparation must still serve a purpose. Pre-throw preparation should be individualized to the athlete, address current needs rather than habits, and prepare the body to throw efficiently - not excessively.</p>
-        </div>
-        <div class="callout callout-warn"><span class="ct">Critical Rule</span><strong>Stop throwing when you are warm.</strong> Between catch play, long toss, plyo ball work, and pre-game bullpens, athletes can easily accumulate 100-150 throws before competition begins. Those throws count. Every throw before competition is a throw spent. Protect them.</div>
-        <div class="prose" style="margin-top:16px">
-          <p>Preparation is most important on hard days - not least important. An athlete who skips preparation and goes straight to a bullpen is asking cold, unprepared tissue to absorb forces it is not ready for. The harder the session ahead, the more important it is to arrive prepared.</p>
-        </div>
-
-        <div class="h2">Long Toss</div>
-        <div class="prose">
-          <p>Long toss can be a valuable tool when it reinforces quality movement and is programmed with intention. When done correctly, it builds arm strength, reinforces extension through the release point, and develops the tissue tolerance required for high-velocity throwing.</p>
-          <p>When done incorrectly - at excessive distances, with poor mechanics, or in high volumes on top of other throwing - it accelerates fatigue and creates movement patterns that carry into competitive throwing.</p>
-        </div>
-        <div class="callout callout-navy"><strong>For most athletes, long toss should not exceed 120-150 feet.</strong> Quality of movement always takes priority over distance. Throwing farther is not always throwing better. Throwing on a line matters - excessive launch angles create poor habits that transfer to the mound.</div>
-        <ul class="clist" style="margin-top:16px">
-          <li>Build distance gradually - do not start at max distance</li>
-          <li>Crow hop mechanics on line throws - not max-effort pull-downs unless specifically prescribed</li>
-          <li>120 feet is the standard ceiling for most high school athletes</li>
-          <li>150 feet is the absolute ceiling - rarely necessary and only for advanced athletes</li>
-          <li>Long toss volume counts toward daily and weekly throw totals</li>
-          <li>Never use long toss as a substitute for a bullpen on a prescribed off day</li>
-        </ul>
-
-        <div class="h2">Weighted Balls</div>
-        <div class="callout callout-warn"><span class="ct">Age Restriction</span>Weighted ball training is intended for athletes <strong>16 years of age and older</strong> who have completed a full baseline assessment, are currently pain-free, have no history of elbow or shoulder injury within the past 12 months, and are under the supervision of a qualified professional.</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px">
-          <div class="std-card" style="border-top-color:#1A6A1A">
-            <div class="sct" style="color:#1A6A1A">Appropriate Candidates</div>
-            <ul class="clist">
-              <li>Age 16 or older with near-mature growth plates</li>
-              <li>Pain-free for minimum 6 months</li>
-              <li>Passed full baseline movement screen</li>
-              <li>Adequate shoulder strength - ER:IR ratio at or above 0.75</li>
-              <li>Internal rotation within 10 degrees bilateral</li>
-              <li>Strong kinetic chain mechanics</li>
-              <li>Under supervision of qualified AT or sports medicine professional</li>
-            </ul>
-          </div>
-          <div class="std-card" style="border-top-color:#C8402A">
-            <div class="sct" style="color:#C8402A">Do Not Use If...</div>
-            <ul class="clist red">
-              <li>Currently experiencing elbow or shoulder pain</li>
-              <li>History of UCL injury, repair, or reconstruction</li>
-              <li>Active growth plate - typically under age 15-16</li>
-              <li>Less than 12 months post arm injury</li>
-              <li>Elbow extension deficit greater than 10 degrees</li>
-              <li>GIRD greater than 20 degrees compared to non-throwing arm</li>
-              <li>Inadequate kinetic chain strength or movement faults</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="h2">Intent vs. Velocity</div>
-        <div class="prose">
-          <p>Intent refers to effort level - not velocity. This distinction matters because velocity is an outcome, not an input. An athlete who chases velocity during a recovery bullpen or a return-to-throw session is using the wrong target. The target is the effort level prescribed.</p>
-          <p>This is why percentage-based language is used throughout this program. When a week calls for 70% intent, the goal is to throw at 70% of maximum effort - not 70% of maximum velocity. For pitchers, a radar gun can be a useful reference point. If a pitcher's average fastball is 85 mph, 70% intent is roughly 59-60 mph. But the gun is a reference, not the goal.</p>
-        </div>
-        <div class="callout callout-navy"><strong>Velocity should never be chased during any structured throwing program.</strong> An athlete who consistently throws harder than prescribed is not ahead of schedule - they are accumulating stress the program did not account for.</div>
-        <table class="tbl" style="margin-top:16px">
-          <thead><tr><th>Intent Level</th><th>Description</th><th>When Used</th></tr></thead>
-          <tbody>
-            <tr><td><strong>40-50%</strong></td><td>Easy catch - arm loosening only</td><td>Warm-up, early RTT steps, recovery days</td></tr>
-            <tr><td><strong>50-70%</strong></td><td>Controlled effort - mechanics focus</td><td>Early mound progression, short box work</td></tr>
-            <tr><td><strong>70-85%</strong></td><td>Building effort - strong but not max</td><td>Mid-progression bullpens, long toss ceiling</td></tr>
-            <tr><td><strong>85-95%</strong></td><td>Near-competitive effort</td><td>Late progression bullpens, game warm-up</td></tr>
-            <tr><td><strong>100%</strong></td><td>Full competitive intent</td><td>Game outings, late mound progression only</td></tr>
-          </tbody>
-        </table>
-        <div class="callout callout-gold" style="margin-top:16px"><strong>Keep high days high and low days low.</strong> The gray zone - days that are neither true recovery nor true development - is where chronic stress accumulates. Avoid it.</div>
-      </div>
+  <div class="sec-eyebrow">Foundation</div>
+  <h1 class="sec-title">Arm Care Principles</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">AAM Members</div>
+    <div class="clin-gate-sub">This section is part of the full AAM program. Log in to your approved AAM account, or enter your access code.</div>
+    <input type="text" id="aam-in-principles" placeholder="ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamTier2FromShell('principles')">
+    <button class="gate-btn" onclick="aamTier2FromShell('principles')">Unlock</button>
+    <div class="clin-err" id="aam-err-principles"></div>
+    <div class="aam-lock-note">Want to work with AAM directly? <a onclick="showSection('contact')">Contact us</a>.</div>
+  </div>
+</div>
 
       <!-- GET HOT -->
       <div class="section" id="sec-gethot">
-        <div class="sec-eyebrow">Programs - Pre-Game</div>
-        <h1 class="sec-title">Get Hot Routine</h1>
-        <div class="gold-bar"></div>
-        <div class="h2">Dynamic Activation</div>
-        <table class="tbl"><thead><tr><th>Exercise</th><th>Notes</th></tr></thead><tbody>
-          <tr><td><strong>Deep Breath</strong></td><td>4 sec inhale, 4 sec hold, 8 sec exhale</td></tr>
-          <tr><td><strong>Scissor Jumps</strong></td><td></td></tr>
-          <tr><td><strong>Side to Side Jumps</strong></td><td></td></tr>
-          <tr><td><strong>Lateral Shuffle and Stick</strong></td><td></td></tr>
-          <tr><td><strong>Reverse Lunge with Rotation</strong></td><td></td></tr>
-          <tr><td><strong>A Skips</strong></td><td></td></tr>
-          <tr><td><strong>Hip Swings</strong></td><td></td></tr>
-          <tr><td><strong>Bent Over Trunk Rotation</strong></td><td></td></tr>
-          <tr><td><strong>Banded External Rotation</strong></td><td></td></tr>
-          <tr><td><strong>Banded Low Row</strong></td><td></td></tr>
-          <tr><td><strong>Scap Push Ups</strong></td><td></td></tr>
-        </tbody></table>
-        <div class="h2">Arm Ramp</div>
-        <table class="tbl"><thead><tr><th>Exercise</th><th>Volume</th><th>Notes</th></tr></thead><tbody>
-          <tr><td><strong>Light Plyo Throw or Wrist Flick</strong></td><td></td><td></td></tr>
-          <tr><td><strong>Short Catch</strong></td><td>6-8 throws</td><td>30-45 feet, 60-70% intent</td></tr>
-          <tr><td><strong>Reverse Throws</strong></td><td>1 x 4</td><td></td></tr>
-          <tr><td><strong>Decel Throws</strong></td><td>1 x 4</td><td></td></tr>
-        </tbody></table>
-        <div class="h2">Mound Transition</div>
-        <ul class="clist"><li>3 Fastballs at 70%</li><li>2 Fastballs at 85%</li><li>1 Fastball at Game Intent</li><li>1-2 Secondary Pitches if time allows</li></ul>
-        <div class="callout callout-warn" style="margin-top:16px"><strong>Key Rules:</strong> Do not throw just to throw. No full bullpens to get loose. Stop once you are hot.</div>
-      </div>
+  <div class="sec-eyebrow">Programs - Pre-Game</div>
+  <h1 class="sec-title">Get Hot Routine</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">AAM Members</div>
+    <div class="clin-gate-sub">This section is part of the full AAM program. Log in to your approved AAM account, or enter your access code.</div>
+    <input type="text" id="aam-in-gethot" placeholder="ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamTier2FromShell('gethot')">
+    <button class="gate-btn" onclick="aamTier2FromShell('gethot')">Unlock</button>
+    <div class="clin-err" id="aam-err-gethot"></div>
+    <div class="aam-lock-note">Want to work with AAM directly? <a onclick="showSection('contact')">Contact us</a>.</div>
+  </div>
+</div>
 
       <!-- GAME DAY -->
       <div class="section" id="sec-gameday">
-        <div class="sec-eyebrow">Programs - Game Day</div>
-        <h1 class="sec-title">Game Day Routines</h1>
-        <div class="sec-sub">Position-specific warm-up protocols to reach competitive readiness in the fewest throws</div>
-        <div class="gold-bar"></div>
-        <div class="callout callout-warn"><strong>The number one mistake athletes make on game day is throwing too much before they throw competitively.</strong> Every throw before competition is a throw spent.</div>
-        <div class="rtabs">
-          <div class="rtab active" onclick="showRoutine('sp',this)">Starting Pitcher</div>
-          <div class="rtab" onclick="showRoutine('rp',this)">Relief Pitcher</div>
-          <div class="rtab" onclick="showRoutine('pos',this)">Position Player</div>
-          <div class="rtab" onclick="showRoutine('cat',this)">Catcher</div>
-        </div>
-        <div class="rcontent active" id="routine-sp">
-          <div class="callout callout-gold"><strong>Total pre-game pitches should not exceed 30-35.</strong></div>
-          <table class="tbl"><thead><tr><th>#</th><th>Activity</th><th>Volume</th><th>Intent</th><th>Notes</th></tr></thead><tbody>
-            <tr><td class="wk">1</td><td>Dynamic Warm-Up</td><td>Full routine</td><td>-</td><td>Complete before any throwing begins</td></tr>
-            <tr><td class="wk">2</td><td>J-Band Pre-Throw Routine</td><td>1 x 8 each</td><td>-</td><td>Full pre-throw band series</td></tr>
-            <tr><td class="wk">3</td><td>Flat ground - easy toss</td><td>20-25 throws at 45-60 ft</td><td>40-50%</td><td>Focus on loosening, not effort</td></tr>
-            <tr><td class="wk">4</td><td>Flat ground - building</td><td>10-15 throws at 60-90 ft</td><td>60-70%</td><td>Gradual intensity increase</td></tr>
-            <tr><td class="wk">5</td><td>Flat ground - crow hop</td><td>5-8 throws at 90 ft</td><td>75-80%</td><td>Simulate game-effort mechanics</td></tr>
-            <tr><td class="wk">6</td><td>Mound - fastball only</td><td>8-10 pitches</td><td>80-85%</td><td>Work on release, not max velo</td></tr>
-            <tr><td class="wk">7</td><td>Mound - full repertoire</td><td>10-12 pitches</td><td>85-90%</td><td>Off-speed included, game-ready</td></tr>
-            <tr><td class="wk">8</td><td>Rest and stay warm</td><td>Until game time</td><td>-</td><td>Light movement, stay loose</td></tr>
-          </tbody></table>
-        </div>
-        <div class="rcontent" id="routine-rp">
-          <div class="callout callout-gold"><strong>Track all bullpen activity.</strong> Relievers who warm up 2-3 times without entering accumulate significant invisible throwing volume.</div>
-          <table class="tbl"><thead><tr><th>#</th><th>Activity</th><th>Volume</th><th>Intent</th><th>Notes</th></tr></thead><tbody>
-            <tr><td class="wk">1</td><td>Bands abbreviated</td><td>8 reps key exercises</td><td>-</td><td>Scaption, rows, ER</td></tr>
-            <tr><td class="wk">2</td><td>Easy flat ground</td><td>8-10 throws at 45 ft</td><td>40-50%</td><td>Get the arm moving quickly</td></tr>
-            <tr><td class="wk">3</td><td>Building toss</td><td>8-10 throws at 60-75 ft</td><td>65-75%</td><td>Increase intent steadily</td></tr>
-            <tr><td class="wk">4</td><td>Mound - fastball</td><td>6-8 pitches</td><td>85-90%</td><td>Hard and fast - game ready</td></tr>
-            <tr><td class="wk">5</td><td>Mound - full repertoire</td><td>4-6 pitches</td><td>90-95%</td><td>Off-speed to confirm feel</td></tr>
-          </tbody></table>
-        </div>
-        <div class="rcontent" id="routine-pos">
-          <table class="tbl"><thead><tr><th>#</th><th>Activity</th><th>Volume</th><th>Intent</th><th>Notes</th></tr></thead><tbody>
-            <tr><td class="wk">1</td><td>Dynamic Warm-Up</td><td>Full routine</td><td>-</td><td>Do not skip for position players</td></tr>
-            <tr><td class="wk">2</td><td>Abbreviated J-Band</td><td>5-6 exercises x 8 reps</td><td>-</td><td>Low row, ER, scaption, rows</td></tr>
-            <tr><td class="wk">3</td><td>Catch - easy</td><td>10-12 throws at 45 ft</td><td>50%</td><td>Easy pace, feel the ball</td></tr>
-            <tr><td class="wk">4</td><td>Catch - building</td><td>8-10 throws at 60-90 ft</td><td>65-75%</td><td>Increase to position-appropriate distance</td></tr>
-            <tr><td class="wk">5</td><td>Position-specific throws</td><td>5-8 throws</td><td>80-90%</td><td>Simulate game throws from position</td></tr>
-            <tr><td class="wk">6</td><td>Full effort rep</td><td>2-3 throws</td><td>90-95%</td><td>One all-out throw from position</td></tr>
-          </tbody></table>
-        </div>
-        <div class="rcontent" id="routine-cat">
-          <div class="callout callout-gold"><strong>Catchers should complete the full post-throw band routine after every game and practice.</strong></div>
-          <table class="tbl"><thead><tr><th>#</th><th>Activity</th><th>Volume</th><th>Intent</th><th>Notes</th></tr></thead><tbody>
-            <tr><td class="wk">1</td><td>Full dynamic warm-up</td><td>Complete</td><td>-</td><td>Include hip mobility</td></tr>
-            <tr><td class="wk">2</td><td>Full J-Band series</td><td>Pre-throw complete</td><td>-</td><td>Never skip for catchers</td></tr>
-            <tr><td class="wk">3</td><td>Flat ground easy</td><td>10-12 at 45 ft</td><td>40-50%</td><td>Easy movement</td></tr>
-            <tr><td class="wk">4</td><td>Flat ground building</td><td>8-10 at 60-75 ft</td><td>65-70%</td><td>Build toward throw-down distance</td></tr>
-            <tr><td class="wk">5</td><td>Crouch throws</td><td>5-6 throws</td><td>75-80%</td><td>Simulate throw-down mechanics</td></tr>
-            <tr><td class="wk">6</td><td>Full effort throw-downs</td><td>3-5 throws</td><td>90-95%</td><td>Second base distance, full effort</td></tr>
-            <tr><td class="wk">7</td><td>Pop time check</td><td>1-2 throws</td><td>100%</td><td>Confirm readiness</td></tr>
-          </tbody></table>
-        </div>
-      </div>
+  <div class="sec-eyebrow">Programs - Game Day</div>
+  <h1 class="sec-title">Game Day Routines</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">AAM Members</div>
+    <div class="clin-gate-sub">This section is part of the full AAM program. Log in to your approved AAM account, or enter your access code.</div>
+    <input type="text" id="aam-in-gameday" placeholder="ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamTier2FromShell('gameday')">
+    <button class="gate-btn" onclick="aamTier2FromShell('gameday')">Unlock</button>
+    <div class="clin-err" id="aam-err-gameday"></div>
+    <div class="aam-lock-note">Want to work with AAM directly? <a onclick="showSection('contact')">Contact us</a>.</div>
+  </div>
+</div>
 
 
       <!-- LONG TOSS -->
       <div class="section" id="sec-longtoss">
-        <div class="sec-eyebrow">Programs</div>
-        <h1 class="sec-title">Long Toss</h1>
-        <div class="sec-sub">Guidelines, mechanics, and standards for the throwing athlete</div>
-        <div class="gold-bar"></div>
-
-        <div class="callout callout-navy">Long toss is a tool — not a competition. When done correctly it builds arm strength, reinforces extension through the release point, and develops the tissue tolerance required for high-velocity throwing. When done incorrectly it accelerates fatigue and creates movement patterns that carry into competitive throwing.</div>
-
-        <div class="h2">Core Rules</div>
-        <ul class="clist">
-          <li>Build distance gradually — do not start at maximum distance</li>
-          <li>Crow hop mechanics on all line throws — not pull-downs unless specifically prescribed</li>
-          <li>120 feet is the standard ceiling for most high school athletes</li>
-          <li>150 feet is the absolute ceiling — only for advanced athletes with specific programming</li>
-          <li>Throwing on a line matters — excessive launch angles create poor habits that transfer to the mound</li>
-          <li>Long toss volume counts toward daily and weekly throw totals</li>
-          <li>Never use long toss as a substitute for a bullpen on a prescribed off day</li>
-          <li>Stop when the arm tells you to — not when you hit a distance target</li>
-        </ul>
-
-        <div class="h2">Crow Hop Mechanics</div>
-        <div class="prose">
-          <p>The crow hop is the foundation of long toss. It simulates the weight transfer, hip rotation, and drive mechanics of the pitching delivery in an open-air context. Every line throw during long toss should use crow hop mechanics unless otherwise prescribed.</p>
-        </div>
-        <table class="tbl">
-          <thead><tr><th>Phase</th><th>Key Points</th></tr></thead>
-          <tbody>
-            <tr><td><strong>Load</strong></td><td>Gather weight on back leg, hip loaded, shoulders relaxed</td></tr>
-            <tr><td><strong>Step and Drive</strong></td><td>Step toward target, drive off back leg, stay closed as long as possible</td></tr>
-            <tr><td><strong>Hip to Shoulder Separation</strong></td><td>Hips rotate first, shoulders follow — same sequencing as the mound</td></tr>
-            <tr><td><strong>Extension</strong></td><td>Full arm extension through release, finish across the body</td></tr>
-            <tr><td><strong>Deceleration</strong></td><td>Follow through completely — the arm does not stop at release</td></tr>
-          </tbody>
-        </table>
-
-        <div class="h2">Distance Standards</div>
-        <div class="sb-card" style="grid-template-columns:repeat(3,1fr)">
-          <div class="sb-item"><div class="sb-lbl">Standard Ceiling</div><div class="sb-val">120 ft</div><div class="sb-note">Most HS athletes</div></div>
-          <div class="sb-item"><div class="sb-lbl">Absolute Ceiling</div><div class="sb-val">150 ft</div><div class="sb-note">Advanced only</div></div>
-          <div class="sb-item"><div class="sb-lbl">Build-Up Start</div><div class="sb-val">45 ft</div><div class="sb-note">Easy toss first</div></div>
-        </div>
-
-        <div class="h2">Sample Long Toss Progression</div>
-        <table class="tbl">
-          <thead><tr><th>Phase</th><th>Distance</th><th>Throws</th><th>Intent</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td><strong>Warm-Up</strong></td><td>45-60 ft</td><td>10-15</td><td>40-50%</td><td>Easy toss, get arm moving</td></tr>
-            <tr><td><strong>Build</strong></td><td>60-90 ft</td><td>8-10</td><td>60-70%</td><td>Steady increase, crow hop</td></tr>
-            <tr><td><strong>Work</strong></td><td>90-120 ft</td><td>10-15</td><td>75-85%</td><td>Line throws, full crow hop</td></tr>
-            <tr><td><strong>Pull-Down</strong></td><td>60-90 ft</td><td>5-8</td><td>85-90%</td><td>Only if prescribed — not every session</td></tr>
-            <tr><td><strong>Finish</strong></td><td>45-60 ft</td><td>5-8</td><td>50-60%</td><td>Cool down, easy finish</td></tr>
-          </tbody>
-        </table>
-
-        <div class="callout callout-warn" style="margin-top:16px"><span class="ct">Common Mistakes</span>
-          Starting at max distance without building up — throwing for distance instead of quality — excessive launch angles that do not translate to mound mechanics — skipping the cool-down phase — using long toss on days the arm needs rest.
-        </div>
-
-        <div class="callout callout-gold" style="margin-top:12px"><strong>Keep high days high and low days low.</strong> A long toss day is a high day. Treat it accordingly — full preparation, full post-throw routine, adequate recovery before the next session.</div>
-      </div>
+  <div class="sec-eyebrow">Programs</div>
+  <h1 class="sec-title">Long Toss</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">AAM Members</div>
+    <div class="clin-gate-sub">This section is part of the full AAM program. Log in to your approved AAM account, or enter your access code.</div>
+    <input type="text" id="aam-in-longtoss" placeholder="ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamTier2FromShell('longtoss')">
+    <button class="gate-btn" onclick="aamTier2FromShell('longtoss')">Unlock</button>
+    <div class="clin-err" id="aam-err-longtoss"></div>
+    <div class="aam-lock-note">Want to work with AAM directly? <a onclick="showSection('contact')">Contact us</a>.</div>
+  </div>
+</div>
 
       <!-- MOUND -->
       <div class="section" id="sec-mound">
-        <div class="sec-eyebrow">Programs - Pitchers</div>
-        <h1 class="sec-title">Mound Progression</h1>
-        <div class="sec-sub">Weeks 1-10 following the Interval Throwing Program</div>
-        <div class="gold-bar"></div>
-        <table class="tbl"><thead><tr><th style="text-align:center;width:60px">Week</th><th>Activity</th><th style="width:80px">Volume</th><th style="width:90px">Intent</th><th>Goal</th></tr></thead><tbody>
-          <tr><td class="wk">1</td><td>Flat Ground</td><td style="text-align:center">20</td><td class="int-low">50%</td><td>Reintroduce throwing mechanics, rhythm, and basic arm tolerance</td></tr>
-          <tr><td class="wk">2</td><td>Flat Ground</td><td style="text-align:center">20-25</td><td class="int-mid">50-70%</td><td>Build consistency and repeatability while gradually increasing intent</td></tr>
-          <tr><td class="wk">3</td><td>Bullpen</td><td style="text-align:center">15</td><td class="int-low">50%</td><td>Restore mound familiarity at low intent</td></tr>
-          <tr><td class="wk">4</td><td>Bullpen</td><td style="text-align:center">30</td><td class="int-low">50%</td><td>Increase mound volume without increasing intensity</td></tr>
-          <tr><td class="wk">5</td><td>Bullpen</td><td style="text-align:center">45</td><td class="int-mid">50-70%</td><td>Introduce controlled intent while maintaining clean mechanics</td></tr>
-          <tr><td class="wk">6</td><td>Bullpen</td><td style="text-align:center">60</td><td class="int-mid">70%</td><td>Increase mound intent while preserving arm elasticity</td></tr>
-          <tr><td class="wk">7</td><td>Bullpen</td><td style="text-align:center">20</td><td class="int-high">100%</td><td>First exposure to full intent at intentionally low volume</td></tr>
-          <tr><td class="wk">8</td><td>Bullpen</td><td style="text-align:center">30</td><td class="int-high">100%</td><td>Prepare CNS for sustained full-intent throwing</td></tr>
-          <tr><td class="wk">9</td><td>Bullpen</td><td style="text-align:center">40</td><td class="int-high">100%</td><td>Transition to competitive throwing</td></tr>
-          <tr><td class="wk">10</td><td>Bullpen</td><td style="text-align:center">50</td><td class="int-high">100%</td><td>Build volume to withstand normal workloads</td></tr>
-        </tbody></table>
-        <div class="callout callout-navy" style="margin-top:18px"><strong>Intent refers to effort level, not velocity.</strong> Velocity should never be chased during this program.</div>
-      </div>
+  <div class="sec-eyebrow">Programs - Pitchers</div>
+  <h1 class="sec-title">Mound Progression</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">AAM Members</div>
+    <div class="clin-gate-sub">This section is part of the full AAM program. Log in to your approved AAM account, or enter your access code.</div>
+    <input type="text" id="aam-in-mound" placeholder="ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamTier2FromShell('mound')">
+    <button class="gate-btn" onclick="aamTier2FromShell('mound')">Unlock</button>
+    <div class="clin-err" id="aam-err-mound"></div>
+    <div class="aam-lock-note">Want to work with AAM directly? <a onclick="showSection('contact')">Contact us</a>.</div>
+  </div>
+</div>
 
       <!-- PITCH COUNT -->
       <div class="section" id="sec-pitchcount">
@@ -1578,7 +1377,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
           </div>
           <div class="std-card">
             <div class="sct">Step 5</div>
-            <div class="scb">Open the app from your home screen. Enter your access code: <strong>AAM2026</strong></div>
+            <div class="scb">Open the app from your home screen. Log in with your AAM account, or tap <strong>Continue to Free Version</strong>.</div>
           </div>
           <div class="std-card">
             <div class="sct">Done</div>
@@ -1606,7 +1405,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
           </div>
           <div class="std-card">
             <div class="sct">Step 5</div>
-            <div class="scb">Open the app from your home screen and enter: <strong>AAM2026</strong></div>
+            <div class="scb">Open the app from your home screen and log in with your AAM account.</div>
           </div>
           <div class="std-card">
             <div class="sct">Done</div>
@@ -1712,470 +1511,71 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
       <!-- CONTACT -->
       <!-- THROWING PROGRAM BUILDER (CLINICAL) -->
       <div class="section" id="sec-throwbuilder">
-        <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
-        <h1 class="sec-title">Throwing Program Builder</h1>
-        <div class="sec-sub">Build an individualized throwing program and export it on AAM letterhead</div>
-        <div class="gold-bar"></div>
-
-        <div id="tb-gate">
-          <div class="clin-gate">
-            <div class="clin-gate-lbl">Staff Access</div>
-            <div class="clin-gate-sub">This tool is for AAM clinical staff. Enter the staff code to continue.</div>
-            <input type="password" id="tb-code-input" placeholder="STAFF CODE" autocomplete="off">
-            <button class="gate-btn" onclick="checkClinCode('tb')">Unlock</button>
-            <div class="clin-err" id="tb-code-err"></div>
-          </div>
-        </div>
-
-        <div id="tb-content" style="display:none">
-          <div class="tool-form">
-            <div class="form-row-2">
-              <div><label class="form-label">Patient Name</label><input type="text" class="form-input" id="tb-name" placeholder="e.g. Jake Miller"></div>
-              <div><label class="form-label">Diagnosis / Reason</label><input type="text" class="form-input" id="tb-dx" placeholder="e.g. UCL sprain - RTT"></div>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Program Template</label>
-                <select class="form-select" id="tb-template">
-                  <option value="full">Full Return-to-Throw (Flat Ground &rarr; Long Toss &rarr; Mound)</option>
-                  <option value="flatground">Flat Ground Progression Only</option>
-                  <option value="longtoss">Long Toss Build-Up Only</option>
-                  <option value="mound">Mound / Bullpen Progression Only</option>
-                  <option value="custom">Custom / Blank Table</option>
-                </select>
-              </div>
-              <div><label class="form-label">Start Date</label><input type="date" class="form-input" id="tb-startdate"></div>
-            </div>
-            <div class="form-row">
-              <label class="form-label">Throwing Days</label>
-              <div class="day-check-row" id="tb-days">
-                <div class="day-check" data-day="0">Sun</div>
-                <div class="day-check" data-day="1">Mon</div>
-                <div class="day-check" data-day="2">Tue</div>
-                <div class="day-check" data-day="3">Wed</div>
-                <div class="day-check" data-day="4">Thu</div>
-                <div class="day-check" data-day="5">Fri</div>
-                <div class="day-check" data-day="6">Sat</div>
-              </div>
-            </div>
-            <div class="form-row"><label class="form-label">Clinician Notes / Restrictions - optional</label>
-              <textarea class="form-textarea" id="tb-notes" placeholder="e.g. No pull-downs until week 6. Ice after every session."></textarea>
-            </div>
-            <button class="btn-primary" onclick="generateThrowProgram()">Generate Program</button>
-          </div>
-
-          <div class="h2">Program Table</div>
-          <div class="tb-table-wrap">
-            <table class="tbl clin-table" id="tb-table">
-              <thead><tr><th style="width:90px">Day/Week</th><th style="width:110px">Date</th><th>Activity</th><th style="width:90px">Volume</th><th style="width:80px">Intent</th><th>Notes</th><th style="width:30px"></th></tr></thead>
-              <tbody id="tb-table-body"><tr><td colspan="7" style="color:#7A7A85;padding:16px 12px">Choose a template above and click Generate Program.</td></tr></tbody>
-            </table>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-            <button class="btn-secondary" onclick="addTbRow()">+ Add Row</button>
-          </div>
-
-          <div class="h2">Export</div>
-          <div class="tool-form">
-            <button class="btn-primary" onclick="exportThrowProgramDocx()">Generate Word Document (AAM Letterhead)</button>
-            <div class="save-msg" id="tb-export-msg">Document generated</div>
-            <div class="tb-privacy-note"><strong>Privacy note:</strong> nothing entered here is saved or stored. The patient name and program are only held in this page while it's open, and clear when you navigate away or close the tab.</div>
-          </div>
-        </div>
-      </div>
+  <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
+  <h1 class="sec-title">Throwing Program Builder</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">Staff Access</div>
+    <div class="clin-gate-sub">This tool is for AAM clinical staff. Log in with your approved AAM account and enter the staff code.</div>
+    <input type="password" id="aam-in-throwbuilder" placeholder="STAFF CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamStaffFromShell('throwbuilder')">
+    <button class="gate-btn" onclick="aamStaffFromShell('throwbuilder')">Unlock</button>
+    <div class="clin-err" id="aam-err-throwbuilder"></div>
+  </div>
+</div>
 
       <!-- RUN/JUMP PROGRESSION BUILDER (CLINICAL) -->
       <div class="section" id="sec-runjump">
-        <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
-        <h1 class="sec-title">Run/Jump Progression Builder</h1>
-        <div class="sec-sub">Build an individualized plyometric and speed/agility progression and export it on AAM letterhead</div>
-        <div class="gold-bar"></div>
-
-        <div id="rj-gate">
-          <div class="clin-gate">
-            <div class="clin-gate-lbl">Staff Access</div>
-            <div class="clin-gate-sub">This tool is for AAM clinical staff. Enter the staff code to continue.</div>
-            <input type="password" id="rj-code-input" placeholder="STAFF CODE" autocomplete="off">
-            <button class="gate-btn" onclick="checkClinCode('rj')">Unlock</button>
-            <div class="clin-err" id="rj-code-err"></div>
-          </div>
-        </div>
-
-        <div id="rj-content" style="display:none">
-          <div class="tool-form">
-            <div class="form-row-2">
-              <div><label class="form-label">Patient Name</label><input type="text" class="form-input" id="rj-name" placeholder="e.g. Jake Miller"></div>
-              <div><label class="form-label">Diagnosis / Reason</label><input type="text" class="form-input" id="rj-dx" placeholder="e.g. ACL reconstruction - RTS"></div>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Program Template</label>
-                <select class="form-select" id="rj-template">
-                  <option value="full">Full Progression (Plyometric Tiers &rarr; Speed/COD Weeks 1-8)</option>
-                  <option value="plyo">Plyometric Progression Only</option>
-                  <option value="speedcod">Speed &amp; Change of Direction Only (Weeks 1-8)</option>
-                  <option value="custom">Custom / Blank Table</option>
-                </select>
-              </div>
-              <div><label class="form-label">Start Date</label><input type="date" class="form-input" id="rj-startdate"></div>
-            </div>
-            <div class="form-row">
-              <label class="form-label">Training Days</label>
-              <div class="day-check-row" id="rj-days">
-                <div class="day-check" data-day="0">Sun</div>
-                <div class="day-check" data-day="1">Mon</div>
-                <div class="day-check" data-day="2">Tue</div>
-                <div class="day-check" data-day="3">Wed</div>
-                <div class="day-check" data-day="4">Thu</div>
-                <div class="day-check" data-day="5">Fri</div>
-                <div class="day-check" data-day="6">Sat</div>
-              </div>
-            </div>
-            <div class="form-row"><label class="form-label">Clinician Notes / Restrictions - optional</label>
-              <textarea class="form-textarea" id="rj-notes" placeholder="e.g. No single-leg landings until 12 weeks post-op. Monitor for effusion."></textarea>
-            </div>
-            <button class="btn-primary" onclick="generateRunJumpProgram()">Generate Program</button>
-          </div>
-
-          <div class="h2">Program Table</div>
-          <div class="tb-table-wrap">
-            <table class="tbl clin-table" id="rj-table">
-              <thead><tr><th style="width:90px">Day/Week</th><th style="width:110px">Date</th><th>Activity</th><th style="width:110px">Volume</th><th style="width:90px">Intent</th><th>Notes</th><th style="width:30px"></th></tr></thead>
-              <tbody id="rj-table-body"><tr><td colspan="7" style="color:#7A7A85;padding:16px 12px">Choose a template above and click Generate Program.</td></tr></tbody>
-            </table>
-          </div>
-          <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-            <button class="btn-secondary" onclick="addRjRow()">+ Add Row</button>
-          </div>
-
-          <div class="h2">Export</div>
-          <div class="tool-form">
-            <button class="btn-primary" onclick="exportRunJumpProgramDocx()">Generate Word Document (AAM Letterhead)</button>
-            <div class="save-msg" id="rj-export-msg">Document generated</div>
-            <div class="tb-privacy-note"><strong>Privacy note:</strong> nothing entered here is saved or stored. The patient name and program are only held in this page while it's open, and clear when you navigate away or close the tab.</div>
-          </div>
-        </div>
-      </div>
+  <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
+  <h1 class="sec-title">Run/Jump Progression Builder</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">Staff Access</div>
+    <div class="clin-gate-sub">This tool is for AAM clinical staff. Log in with your approved AAM account and enter the staff code.</div>
+    <input type="password" id="aam-in-runjump" placeholder="STAFF CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamStaffFromShell('runjump')">
+    <button class="gate-btn" onclick="aamStaffFromShell('runjump')">Unlock</button>
+    <div class="clin-err" id="aam-err-runjump"></div>
+  </div>
+</div>
 
       
       
       <div class="section" id="sec-armscreen">
-        <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
-        <h1 class="sec-title">Arm Care Screen</h1>
-        <div class="sec-sub">Complete the form and generate a PDF for the athlete chart</div>
-        <div class="gold-bar"></div>
-        <div id="armscreen-gate">
-          <div class="callout callout-navy">
-            <div class="clin-gate-sub">Staff access required.</div>
-            <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-              <input type="password" id="armscreen-code" placeholder="Staff code" class="form-input" style="max-width:180px;letter-spacing:3px;">
-              <button class="btn-primary" onclick="unlockArmScreen()">Unlock</button>
-            </div>
-            <div id="armscreen-err" style="color:#F08070;font-size:12px;margin-top:8px;min-height:16px"></div>
-          </div>
-        </div>
-        <div id="armscreen-form" style="display:none">
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Athlete Information</div>
-            <div class="form-row-2">
-              <div><label class="form-label">Athlete Name</label><input type="text" class="form-input" id="as-name" placeholder="First Last"></div>
-              <div><label class="form-label">Date</label><input type="date" class="form-input" id="as-date"></div>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Position</label>
-                <select class="form-select" id="as-pos"><option>Starting Pitcher</option><option>Relief Pitcher</option><option>Catcher</option><option>Infield</option><option>Outfield</option></select>
-              </div>
-              <div><label class="form-label">Dominant Arm</label>
-                <select class="form-select" id="as-dom"><option>Right</option><option>Left</option></select>
-              </div>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Age</label><input type="number" class="form-input" id="as-age" placeholder="e.g. 16"></div>
-              <div><label class="form-label">Current Symptoms (Y/N)</label>
-                <select class="form-select" id="as-sx"><option>No</option><option>Yes</option></select>
-              </div>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Years Pitching</label><input type="text" class="form-input" id="as-yrs" placeholder="e.g. 4"></div>
-              <div><label class="form-label">Velocity (approx)</label><input type="text" class="form-input" id="as-vel" placeholder="e.g. 82 mph"></div>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Innings / Week</label><input type="text" class="form-input" id="as-inn"></div>
-              <div><label class="form-label">Offseason Shutdown</label>
-                <select class="form-select" id="as-shut"><option>Yes</option><option>No</option></select>
-              </div>
-            </div>
-            <div class="form-row"><label class="form-label">Chief Complaint / Current Injury Status</label>
-              <textarea class="form-textarea" id="as-complaint" placeholder="Describe current symptoms, location, onset, behavior with throwing..."></textarea>
-            </div>
-            <div class="form-row"><label class="form-label">Prior Injury History</label>
-              <textarea class="form-textarea" id="as-hx" placeholder="Prior injuries, surgeries, procedures with side and year..."></textarea>
-            </div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Shoulder — ROM and Strength</div>
-            <div style="overflow-x:auto">
-            <table class="tbl" style="min-width:500px"><thead><tr><th>Motion</th><th>Throw</th><th>Non-Throw</th><th>Str Throw</th><th>Str N-T</th></tr></thead><tbody>
-              <tr><td><strong>External Rotation</strong></td><td><input type="text" class="rom-input" id="sh-er-t"></td><td><input type="text" class="rom-input" id="sh-er-nt"></td><td><select class="rom-select" id="sh-er-st"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="sh-er-snt"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-              <tr><td><strong>Internal Rotation</strong></td><td><input type="text" class="rom-input" id="sh-ir-t"></td><td><input type="text" class="rom-input" id="sh-ir-nt"></td><td><select class="rom-select" id="sh-ir-st"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="sh-ir-snt"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-              <tr style="background:#FDFBF4"><td><strong>Total Arc (ER+IR)</strong></td><td><input type="text" class="rom-input" id="sh-arc-t" placeholder="auto"></td><td><input type="text" class="rom-input" id="sh-arc-nt" placeholder="auto"></td><td><strong style="font-size:12px;color:#0F1E35">Diff:</strong></td><td><input type="text" class="rom-input" id="sh-arc-diff" placeholder="auto"></td></tr>
-              <tr><td><strong>Flexion</strong></td><td><input type="text" class="rom-input" id="sh-fl-t"></td><td><input type="text" class="rom-input" id="sh-fl-nt"></td><td><select class="rom-select" id="sh-fl-st"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="sh-fl-snt"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-              <tr><td><strong>Abduction</strong></td><td><input type="text" class="rom-input" id="sh-ab-t"></td><td><input type="text" class="rom-input" id="sh-ab-nt"></td><td><select class="rom-select" id="sh-ab-st"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="sh-ab-snt"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-              <tr><td><strong>Horizontal ADD</strong></td><td><input type="text" class="rom-input" id="sh-ha-t"></td><td><input type="text" class="rom-input" id="sh-ha-nt"></td><td><select class="rom-select" id="sh-ha-st"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="sh-ha-snt"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-            </tbody></table></div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Elbow — ROM</div>
-            <div style="overflow-x:auto">
-            <table class="tbl" style="min-width:500px"><thead><tr><th>Motion</th><th>Throw</th><th>Non-Throw</th><th>Str Throw</th><th>Str N-T</th></tr></thead><tbody>
-              <tr><td><strong>Flexion</strong></td><td><input type="text" class="rom-input" id="el-fl-t"></td><td><input type="text" class="rom-input" id="el-fl-nt"></td><td><select class="rom-select" id="el-fl-st"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="el-fl-snt"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-              <tr><td><strong>Extension (deficit?)</strong></td><td><input type="text" class="rom-input" id="el-ex-t"></td><td><input type="text" class="rom-input" id="el-ex-nt"></td><td><select class="rom-select" id="el-ex-st"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="el-ex-snt"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-            </tbody></table></div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Hip — ROM</div>
-            <div style="overflow-x:auto">
-            <table class="tbl" style="min-width:500px"><thead><tr><th>Motion</th><th>Right</th><th>Left</th><th>Str R</th><th>Str L</th></tr></thead><tbody>
-              <tr><td><strong>Internal Rotation</strong></td><td><input type="text" class="rom-input" id="hip-ir-r"></td><td><input type="text" class="rom-input" id="hip-ir-l"></td><td><select class="rom-select" id="hip-ir-sr"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="hip-ir-sl"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-              <tr><td><strong>External Rotation</strong></td><td><input type="text" class="rom-input" id="hip-er-r"></td><td><input type="text" class="rom-input" id="hip-er-l"></td><td><select class="rom-select" id="hip-er-sr"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="hip-er-sl"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-              <tr><td><strong>Extension (Thomas)</strong></td><td><input type="text" class="rom-input" id="hip-ex-r"></td><td><input type="text" class="rom-input" id="hip-ex-l"></td><td><select class="rom-select" id="hip-ex-sr"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td><td><select class="rom-select" id="hip-ex-sl"><option></option><option>5/5</option><option>4+/5</option><option>4/5</option><option>3+/5</option><option>3/5</option></select></td></tr>
-            </tbody></table></div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Special Tests</div>
-            <div style="overflow-x:auto">
-            <table class="tbl" style="min-width:500px"><thead><tr><th>Test</th><th>Right</th><th>Left</th><th>Finding</th></tr></thead><tbody>
-              <tr><td><strong>Valgus Stress (UCL)</strong></td><td><select class="rom-select" id="st-vr"><option></option><option>Negative</option><option>Positive</option></select></td><td><select class="rom-select" id="st-vl"><option></option><option>Negative</option><option>Positive</option></select></td><td><input type="text" class="form-input" id="st-vf" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>OBriens (SLAP)</strong></td><td><select class="rom-select" id="st-or"><option></option><option>Negative</option><option>Positive</option></select></td><td><select class="rom-select" id="st-ol"><option></option><option>Negative</option><option>Positive</option></select></td><td><input type="text" class="form-input" id="st-of" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>Appley Scratch IR</strong></td><td><select class="rom-select" id="st-ar"><option></option><option>Normal</option><option>Limited</option></select></td><td><select class="rom-select" id="st-al"><option></option><option>Normal</option><option>Limited</option></select></td><td><input type="text" class="form-input" id="st-af" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>ULTT (1 / 2a / 3)</strong></td><td><select class="rom-select" id="st-ur"><option></option><option>Negative</option><option>Positive</option></select></td><td><select class="rom-select" id="st-ul"><option></option><option>Negative</option><option>Positive</option></select></td><td><input type="text" class="form-input" id="st-uf" style="font-size:13px;padding:6px"></td></tr>
-            </tbody></table></div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Scapula and Posture</div>
-            <div style="overflow-x:auto">
-            <table class="tbl" style="min-width:500px"><thead><tr><th>Finding</th><th>Right</th><th>Left</th><th>Grade / Notes</th></tr></thead><tbody>
-              <tr><td><strong>Inferior Position</strong></td><td><select class="rom-select" id="sc-ip-r"><option></option><option>Normal</option><option>Subtle</option><option>Abnormal</option></select></td><td><select class="rom-select" id="sc-ip-l"><option></option><option>Normal</option><option>Subtle</option><option>Abnormal</option></select></td><td><input type="text" class="form-input" id="sc-ip-n" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>Lateral Displacement / Winging</strong></td><td><select class="rom-select" id="sc-ld-r"><option></option><option>Normal</option><option>Subtle</option><option>Abnormal</option></select></td><td><select class="rom-select" id="sc-ld-l"><option></option><option>Normal</option><option>Subtle</option><option>Abnormal</option></select></td><td><input type="text" class="form-input" id="sc-ld-n" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>Dyskinesis</strong></td><td><select class="rom-select" id="sc-dk-r"><option></option><option>Absent</option><option>Subtle</option><option>Obvious</option></select></td><td><select class="rom-select" id="sc-dk-l"><option></option><option>Absent</option><option>Subtle</option><option>Obvious</option></select></td><td><input type="text" class="form-input" id="sc-dk-n" style="font-size:13px;padding:6px"></td></tr>
-            </tbody></table></div>
-            <div style="margin-top:14px;overflow-x:auto">
-            <table class="tbl"><thead><tr><th>Postural Finding</th><th>Normal</th><th>Subtle</th><th>Abnormal</th></tr></thead><tbody>
-              <tr><td><strong>Scapular Winging</strong></td><td><input type="radio" name="post-sw" value="Normal"></td><td><input type="radio" name="post-sw" value="Subtle"></td><td><input type="radio" name="post-sw" value="Abnormal"></td></tr>
-              <tr><td><strong>Anterior Shoulders</strong></td><td><input type="radio" name="post-as" value="Normal"></td><td><input type="radio" name="post-as" value="Subtle"></td><td><input type="radio" name="post-as" value="Abnormal"></td></tr>
-              <tr><td><strong>Kyphotic Posture</strong></td><td><input type="radio" name="post-kp" value="Normal"></td><td><input type="radio" name="post-kp" value="Subtle"></td><td><input type="radio" name="post-kp" value="Abnormal"></td></tr>
-              <tr><td><strong>Forward Head Posture</strong></td><td><input type="radio" name="post-fh" value="Normal"></td><td><input type="radio" name="post-fh" value="Subtle"></td><td><input type="radio" name="post-fh" value="Abnormal"></td></tr>
-            </tbody></table></div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Movement Screens</div>
-            <div style="overflow-x:auto">
-            <table class="tbl" style="min-width:500px"><thead><tr><th>Screen</th><th>Right</th><th>Left</th><th>Result / Notes</th></tr></thead><tbody>
-              <tr><td><strong>Quad T-Spine Rotation</strong></td><td><input type="text" class="rom-input" id="ms-qr-r" placeholder="degrees"></td><td><input type="text" class="rom-input" id="ms-qr-l" placeholder="degrees"></td><td><input type="text" class="form-input" id="ms-qr-n" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>Knee to Wall</strong></td><td><input type="text" class="rom-input" id="ms-kw-r" placeholder="cm"></td><td><input type="text" class="rom-input" id="ms-kw-l" placeholder="cm"></td><td><input type="text" class="form-input" id="ms-kw-n" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>Wall Mobility — Start</strong></td><td><select class="rom-select" id="ms-ws-r"><option></option><option>Y</option><option>N</option></select></td><td><select class="rom-select" id="ms-ws-l"><option></option><option>Y</option><option>N</option></select></td><td><input type="text" class="form-input" id="ms-ws-n" style="font-size:13px;padding:6px"></td></tr>
-              <tr><td><strong>Wall Mobility — Maintain</strong></td><td><select class="rom-select" id="ms-wm-r"><option></option><option>Y</option><option>N</option></select></td><td><select class="rom-select" id="ms-wm-l"><option></option><option>Y</option><option>N</option></select></td><td><input type="text" class="form-input" id="ms-wm-n" style="font-size:13px;padding:6px"></td></tr>
-            </tbody></table></div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Clinical Flags</div>
-            <div class="callout callout-warn" style="margin-bottom:14px"><span class="ct">Check all that apply</span></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-gird" style="margin-top:2px;accent-color:#C9A84C"> GIRD greater than 20 degrees</label>
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-arc" style="margin-top:2px;accent-color:#C9A84C"> Total arc deficit greater than 5 degrees</label>
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-ext" style="margin-top:2px;accent-color:#C9A84C"> Elbow extension deficit greater than 5 degrees</label>
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-valgus" style="margin-top:2px;accent-color:#C9A84C"> Valgus stress test positive</label>
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-scap" style="margin-top:2px;accent-color:#C9A84C"> Scapular dyskinesis present</label>
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-post" style="margin-top:2px;accent-color:#C9A84C"> Forward head or kyphotic posture</label>
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-sx" style="margin-top:2px;accent-color:#C9A84C"> Current arm symptoms present</label>
-              <label style="display:flex;align-items:flex-start;gap:8px;font-size:13px;background:#fff;border:1px solid #E8E4DC;border-radius:4px;padding:10px;cursor:pointer"><input type="checkbox" id="flag-ucl" style="margin-top:2px;accent-color:#C9A84C"> Prior UCL or shoulder surgery history</label>
-            </div>
-          </div>
-          <div class="tool-form">
-            <div class="h2" style="margin-top:0">Findings and Plan</div>
-            <div class="form-row"><label class="form-label">Findings / Clinical Impression</label>
-              <textarea class="form-textarea" id="as-findings" rows="4" placeholder="Summarize key findings and clinical impression..."></textarea>
-            </div>
-            <div class="form-row"><label class="form-label">Plan / Recommendations</label>
-              <textarea class="form-textarea" id="as-plan" rows="4" placeholder="Program assigned, referral, follow-up schedule, restrictions..."></textarea>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Provider Name</label><input type="text" class="form-input" id="as-provider" placeholder="Name and credential"></div>
-              <div><label class="form-label">Refer for Further Evaluation</label>
-                <select class="form-select" id="as-refer"><option>No</option><option>Yes - Orthopedics</option><option>Yes - Sports Medicine MD</option><option>Yes - PT</option><option>Yes - Other</option></select>
-              </div>
-            </div>
-          </div>
-          <div style="padding:0 0 32px;display:flex;flex-direction:column;gap:10px">
-            <button class="btn-primary" onclick="generateArmScreenPDF()" style="width:100%;padding:16px;font-size:14px">Generate PDF Document</button>
-            <button class="btn-secondary" onclick="showSection('home')" style="width:100%">Back to Home</button>
-            <p style="font-size:12px;color:#7A7A85;margin-top:4px;text-align:center">Tap Print / Save PDF in the preview to save to the athlete chart</p>
-          </div>
-        </div>
-      </div>
+  <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
+  <h1 class="sec-title">Arm Care Screen</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">Staff Access</div>
+    <div class="clin-gate-sub">This tool is for AAM clinical staff. Log in with your approved AAM account and enter the staff code.</div>
+    <input type="password" id="aam-in-armscreen" placeholder="STAFF CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamStaffFromShell('armscreen')">
+    <button class="gate-btn" onclick="aamStaffFromShell('armscreen')">Unlock</button>
+    <div class="clin-err" id="aam-err-armscreen"></div>
+  </div>
+</div>
 
 <div class="section" id="sec-programbuilder">
-        <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
-        <h1 class="sec-title">Program Builder</h1>
-        <div class="sec-sub">Select exercises, adjust sets and reps, drag to reorder, generate PDF</div>
-        <div class="gold-bar"></div>
-        <div id="progbuilder-gate">
-          <div class="callout callout-navy">
-            <div class="clin-gate-sub">Staff access required.</div>
-            <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
-              <input type="password" id="progbuilder-code" placeholder="Staff code" class="form-input" style="max-width:180px;letter-spacing:3px;">
-              <button class="btn-primary" onclick="unlockProgBuilder()">Unlock</button>
-            </div>
-            <div id="progbuilder-err" style="color:#F08070;font-size:12px;margin-top:8px;min-height:16px"></div>
-          </div>
-        </div>
-        <div id="progbuilder-form" style="display:none">
-          <div class="tool-form">
-            <div class="form-row-2">
-              <div><label class="form-label">Athlete Name</label><input type="text" class="form-input" id="pb-athlete" placeholder="First Last"></div>
-              <div><label class="form-label">Program Name</label><input type="text" class="form-input" id="pb-progname" placeholder="e.g. Scapular Control Week 1"></div>
-            </div>
-            <div class="form-row-2">
-              <div><label class="form-label">Provider</label><input type="text" class="form-input" id="pb-provider" placeholder="Name and credential"></div>
-              <div><label class="form-label">Date</label><input type="date" class="form-input" id="pb-date"></div>
-            </div>
-            <div class="form-row"><label class="form-label">Instructions for Athlete</label>
-              <textarea class="form-textarea" id="pb-notes" placeholder="Frequency, when to perform, general notes..."></textarea>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-            <div>
-              <div class="h2">Exercise Library</div>
-              <div style="margin-bottom:10px">
-                <select class="form-select" id="pb-cat-filter" onchange="filterExLib()">
-                  <option value="">All Categories</option>
-                  <option>T-Spine Mobility</option><option>Soft Tissue</option>
-                  <option>Static Stretching</option><option>Dynamic Warm-Up</option>
-                  <option>Pre-Throw Bands</option><option>Post-Throw Bands</option>
-                  <option>Scapular Control</option><option>In-Game</option>
-                </select>
-              </div>
-              <div id="ex-lib-list" style="max-height:560px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
-            </div>
-            <div>
-              <div class="h2">Program <span style="font-size:12px;color:#7A7A85;font-weight:400" id="pb-count">(0 exercises)</span></div>
-              <div class="callout callout-gold" style="margin-bottom:10px;font-size:12px">Click Add or drag exercises here. Drag to reorder.</div>
-              <div id="pb-program-list" style="min-height:160px;background:#F5F4F0;border:2px dashed #E8E4DC;border-radius:6px;padding:8px;display:flex;flex-direction:column;gap:6px"></div>
-              <p style="font-size:12px;color:#7A7A85;margin-top:6px;text-align:center" id="pb-empty-msg">Add exercises from the library</p>
-            </div>
-          </div>
-          <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap">
-            <button class="btn-primary" onclick="generateProgPDF()" style="flex:1;padding:14px;font-size:14px">Generate PDF Program</button>
-            <button class="btn-secondary" onclick="clearProgram()">Clear</button>
-            <button class="btn-secondary" onclick="showSection('home')">Home</button>
-          </div>
-          <p style="font-size:12px;color:#7A7A85;margin-top:8px;text-align:center">Tap Print / Save PDF in the preview to save</p>
-        </div>
-      </div>
+  <div class="sec-eyebrow">Clinical Tool - Staff Only</div>
+  <h1 class="sec-title">Program Builder</h1>
+  <div class="gold-bar"></div>
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">Staff Access</div>
+    <div class="clin-gate-sub">This tool is for AAM clinical staff. Log in with your approved AAM account and enter the staff code.</div>
+    <input type="password" id="aam-in-programbuilder" placeholder="STAFF CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamStaffFromShell('programbuilder')">
+    <button class="gate-btn" onclick="aamStaffFromShell('programbuilder')">Unlock</button>
+    <div class="clin-err" id="aam-err-programbuilder"></div>
+  </div>
+</div>
 
 <div class="section" id="sec-coaches">
   <div class="sec-eyebrow">Coaches Tools</div>
-  <h1 class="sec-title" id="ct-title">Coaches Tools</h1>
-  <div class="sec-sub" id="ct-sub">Practical arm-care tools built for how youth and high school teams actually operate &mdash; small rosters, two-way players, and schedules that don't leave room for ideal rest.</div>
+  <h1 class="sec-title">Coaches Tools</h1>
   <div class="gold-bar"></div>
-
-  <nav class="ct-crumbs" id="ct-crumbs"><a onclick="ctShowLanding()">&larr; Coaches Tools</a></nav>
-
-  <div id="ct-landingView">
-    <div class="ct-section-label">Live Tools</div>
-    <div class="ct-tool-grid">
-      <div class="ct-tool-card" onclick="ctShowTool('exposure')">
-        <div class="ct-tool-icon">TE</div>
-        <h3>Throw Exposure Board</h3>
-        <p>Track mound + position throws together for two-way players and see who's carrying risk across the whole roster.</p>
-        <span class="ct-tool-status ct-status-live">Live prototype</span>
-      </div>
-    </div>
-
-    <div class="ct-section-label">Coming Soon</div>
-    <div class="ct-tool-grid">
-      <div class="ct-tool-card ct-disabled">
-        <div class="ct-tool-icon">WK</div>
-        <h3>Weekly Volume Log</h3>
-        <p>Rolling per-athlete history instead of a single game day &mdash; spot the kids stacking exposure week over week.</p>
-        <span class="ct-tool-status ct-status-soon">Planned</span>
-      </div>
-      <div class="ct-tool-card ct-disabled">
-        <div class="ct-tool-icon">TN</div>
-        <h3>Tournament Mode</h3>
-        <p>Chain multiple same-day and back-to-back games for weekend tournaments, where the math changes fast.</p>
-        <span class="ct-tool-status ct-status-soon">Planned</span>
-      </div>
-    </div>
-
-    <div class="ct-landing-footer">
-      Pitch count guidelines referenced throughout this section come from MLB/USA Baseball's Pitch Smart program &mdash; <a href="https://www.mlb.com/pitch-smart/pitching-guidelines" target="_blank" rel="noopener">mlb.com/pitch-smart/pitching-guidelines</a>. These tools are educational planning aids for coaches and staff and do not replace evaluation by a licensed athletic trainer or physician. Any athlete reporting arm pain or showing altered mechanics should be referred for clinical evaluation regardless of what a tool here shows.
-    </div>
-  </div>
-
-  <div id="ct-toolView">
-
-    <div class="ct-data-disclaimer">
-      <strong>About these numbers:</strong> pitch-count rest tiers are the official MLB/USA Baseball Pitch Smart table, pulled directly from the source below. Field-throw-per-inning estimates (low/mid/high) are still placeholder figures for demonstration only &mdash; no published source quantifies throw volume by position. The exposure math built on top of the official tiers is a working model of the logic, not a validated clinical tool, until the field-throw side is replaced with real observed data. Also note: Pitch Smart separately requires no pitcher appear in a game 3 consecutive days regardless of pitch count &mdash; not yet reflected in this tool.
-      <br><br>
-      <strong>Source:</strong> <a href="https://www.mlb.com/pitch-smart/pitching-guidelines" target="_blank" rel="noopener">mlb.com/pitch-smart/pitching-guidelines</a> &mdash; verify current tiers there, as guidelines are periodically updated.
-    </div>
-
-    <div class="ct-medical-disclaimer">
-      <strong>Not medical advice.</strong> This tool is an educational planning aid for coaches and does not replace evaluation by a licensed athletic trainer, physician, or other qualified medical provider. Any athlete with arm pain, altered mechanics, or reported soreness should be pulled from throwing and referred for a clinical evaluation regardless of what this tool shows.
-    </div>
-
-    <div class="ct-card">
-      <h2>Team Settings</h2>
-      <div class="ct-global-row">
-        <div class="ct-field">
-          <label for="ct-ageGroup">Age Group</label>
-          <select id="ct-ageGroup" onchange="ctRenderBoard()">
-            <option value="8">7&ndash;8</option>
-            <option value="10">9&ndash;10</option>
-            <option value="12">11&ndash;12</option>
-            <option value="14" selected>13&ndash;14</option>
-            <option value="16">15&ndash;16</option>
-            <option value="18">17&ndash;18</option>
-            <option value="22">19&ndash;22</option>
-          </select>
-        </div>
-        <div class="ct-field">
-          <label for="ct-daysToNext">Days Until Next Game</label>
-          <input type="number" id="ct-daysToNext" min="0" value="2" onchange="ctRenderBoard()">
-        </div>
-      </div>
-    </div>
-
-    <div class="ct-card">
-      <h2>Today's Log</h2>
-      <table>
-        <thead>
-          <tr>
-            <th style="width:22%">Player</th>
-            <th style="width:16%">Pitches</th>
-            <th style="width:30%">Position After</th>
-            <th style="width:14%">Innings</th>
-            <th style="width:10%"></th>
-          </tr>
-        </thead>
-        <tbody id="ct-rosterBody"></tbody>
-      </table>
-      <button class="ct-btn ct-btn-secondary ct-add-row" onclick="ctAddPlayer()">+ Add Player</button>
-    </div>
-
-    <div class="ct-card">
-      <h2>Status Board &mdash; Ranked by Risk</h2>
-      <div class="ct-legend">
-        <span><span class="ct-status-dot ct-dot-red"></span>Red &mdash; pushing it into the next game</span>
-        <span><span class="ct-status-dot ct-dot-amber"></span>Amber &mdash; worth a lighter spot</span>
-        <span><span class="ct-status-dot ct-dot-green"></span>Green &mdash; clear</span>
-      </div>
-      <div id="ct-board"></div>
-    </div>
-
-    <div class="ct-footnote">
-      Nothing on this page persists after you close it &mdash; this is a working prototype, not a saved record system yet. Built for AAM.
-    </div>
-
+  <div class="clin-gate" data-aam-shell="1">
+    <div class="clin-gate-lbl">AAM Members</div>
+    <div class="clin-gate-sub">This section is part of the full AAM program. Log in to your approved AAM account, or enter your access code.</div>
+    <input type="text" id="aam-in-coaches" placeholder="ACCESS CODE" autocomplete="off" onkeydown="if(event.key==='Enter')aamTier2FromShell('coaches')">
+    <button class="gate-btn" onclick="aamTier2FromShell('coaches')">Unlock</button>
+    <div class="clin-err" id="aam-err-coaches"></div>
+    <div class="aam-lock-note">Want to work with AAM directly? <a onclick="showSection('contact')">Contact us</a>.</div>
   </div>
 </div>
 
@@ -2210,6 +1610,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
             <option value="athlete">Athlete</option>
           </select>
         </div>
+        <div class="acct-field"><label>Invite Code</label><input type="text" id="acct-signup-invite" placeholder="Provided by AAM" autocomplete="off"></div>
         <button class="gate-btn" onclick="acctSignUp()" id="acct-signup-btn">Create Account</button>
       </div>
 
@@ -2228,9 +1629,21 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
       </div>
     </div>
 
+    <div id="acct-status-banner" style="display:none"></div>
+
         <div id="acct-admin-panel" style="display:none">
       <div class="h2">Platform Overview</div>
       <div class="acct-stats-row" id="acct-admin-stats"></div>
+      <div class="h2" style="margin-top:20px">Members</div>
+      <div class="tb-privacy-note" style="margin-bottom:12px">New sign-ups start as <strong>Pending</strong> and see the free version only. Approve them once payment is set up; pause anyone whose membership lapses.</div>
+      <div class="aam-mem-filters" id="aam-mem-filters">
+        <button class="aam-mem-filter active" data-f="pending" onclick="aamMemFilter('pending')">Pending</button>
+        <button class="aam-mem-filter" data-f="active" onclick="aamMemFilter('active')">Active</button>
+        <button class="aam-mem-filter" data-f="paused" onclick="aamMemFilter('paused')">Paused</button>
+        <button class="aam-mem-filter" data-f="all" onclick="aamMemFilter('all')">All</button>
+      </div>
+      <div id="aam-mem-msg" class="save-msg" style="display:none"></div>
+      <div id="aam-mem-list"></div>
       <div class="h2" style="margin-top:20px">All Teams</div>
       <div id="acct-admin-teams"></div>
     </div>
@@ -2319,11 +1732,11 @@ function gateUnlockApp() {
   sessionStorage.removeItem('aamGuestMode');
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  applyGuestRestrictions(false);
+  applyGuestRestrictions('tier1');
   setTimeout(function(){ try{initTools();}catch(e){} }, 100);
 }
 
-var TIER2_CODE = 'AAMFULL2026'; // access code for everything except Clinical (Staff Only) - change as needed
+// Tier 2 access code is stored in Supabase (aam_settings), never in this file.
 var pendingGuestMode = 'tier1';
 
 function gateContinueFree() {
@@ -2340,13 +1753,18 @@ function toggleTier2Input() {
   box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
 }
 
-function submitTier2Code() {
+async function submitTier2Code() {
   var v = document.getElementById('gate-tier2-code').value.trim().toUpperCase();
   var err = document.getElementById('gate-tier2-err');
-  if (v !== TIER2_CODE) {
-    err.textContent = 'Incorrect code.';
-    return;
-  }
+  err.style.color = '';
+  if (!v) { err.textContent = 'Enter your access code.'; return; }
+  err.style.color = '#8A9BB0';
+  err.textContent = 'Checking code...';
+  var acc = await aamLoadProtected({ tier2Code: v });
+  err.style.color = '';
+  if (!acc) { err.textContent = 'Could not connect. Check your internet connection and try again.'; return; }
+  if (acc.locked) { err.textContent = 'Too many attempts. Try again in 15 minutes.'; return; }
+  if (!acc.tier2_code_ok) { err.textContent = 'Incorrect code.'; return; }
   err.textContent = '';
   document.getElementById('gate-tier2-code').value = '';
   pendingGuestMode = 'tier2';
@@ -2375,10 +1793,12 @@ function acknowledgeFreeDisclaimer() {
 
 function enterGuestMode(mode) {
   mode = mode || 'tier1';
+  if (mode === 'tier2' && !aamSessGet('aamTier2Code')) mode = 'tier1';
   sessionStorage.setItem('aamGuestMode', mode);
   document.getElementById('gate').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   applyGuestRestrictions(mode);
+  if (mode === 'tier2' && !(aamAccess && aamAccess.tier2)) aamLoadProtected();
   showSection('home');
   setTimeout(function(){ try{initTools();}catch(e){} }, 100);
 }
@@ -2395,7 +1815,7 @@ function applyGuestRestrictions(mode) {
     el.style.display = hideClinical ? 'none' : '';
   });
   var navItem = document.getElementById('nav-account-item');
-  if (navItem && mode) navItem.textContent = 'Log In / Sign Up';
+  if (navItem && mode && !aamAccess) navItem.textContent = 'Log In / Sign Up';
 }
 
 function navGoAccount() {
@@ -2415,6 +1835,7 @@ function gateSwitchTab(tab) {
   document.getElementById('gate-login-form').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('gate-signup-form').style.display = tab === 'signup' ? 'block' : 'none';
   document.getElementById('gate-reset-form').style.display = 'none';
+  document.getElementById('gate-code-form').style.display = 'none';
   var err = document.getElementById('gateErr');
   err.textContent = '';
   err.style.color = '';
@@ -2530,15 +1951,15 @@ async function gateSignUp() {
   var sb = ok ? getSb() : null;
   if (!sb) { btn.disabled = false; btn.textContent = 'Create Account'; err.textContent = 'Could not connect. Check your internet connection and try again.'; return; }
 
-  var codeRes = await sb.from('invite_codes').select('active').eq('code', invite).maybeSingle();
-  if (!codeRes.data || !codeRes.data.active) {
+  var codeRes = await sb.rpc('aam_check_invite', { p_code: invite });
+  if (codeRes.error || codeRes.data !== true) {
     btn.disabled = false; btn.textContent = 'Create Account';
     err.textContent = 'Invalid invite code. Check with your coach or AAM staff for the current code.';
     return;
   }
 
   btn.textContent = 'Creating account...';
-  var res = await sb.auth.signUp({ email: email, password: password, options: { data: { full_name: name, role: role } } });
+  var res = await sb.auth.signUp({ email: email, password: password, options: { data: { full_name: name, role: role, invite_code: invite } } });
   btn.disabled = false; btn.textContent = 'Create Account';
   if (res.error) { err.textContent = res.error.message; return; }
 
@@ -2547,7 +1968,7 @@ async function gateSignUp() {
 
   } else {
     err.style.color = '#7ADB9E';
-    err.textContent = 'Account created! Check your email to confirm, then log in.';
+    err.textContent = 'Account created! Check your email to confirm, then log in. AAM will approve your membership.';
     gateSwitchTab('login');
   }
 }
@@ -3356,21 +2777,15 @@ function ensureDocxLoaded() {
   return docxLoadPromise;
 }
 
-var TB_CODE = 'AAMRX2026'; // staff access code - shared by all clinical tools, change this to whatever you like
-
-function checkClinCode(prefix) {
+// Staff code is stored in Supabase (aam_settings), never in this file.
+async function checkClinCode(prefix) {
   var inp = document.getElementById(prefix + '-code-input');
-  var v = inp.value.trim().toUpperCase();
-  if (v === TB_CODE) {
-    clinUnlockAll();
-  } else {
-    document.getElementById(prefix + '-code-err').textContent = 'Incorrect code.';
-    inp.value = '';
-  }
+  var v = inp ? inp.value : '';
+  if (inp) inp.value = '';
+  await aamUnlockClinical(v, document.getElementById(prefix + '-code-err'));
 }
 
 function clinUnlockAll() {
-  sessionStorage.setItem('aamClinUnlocked', '1');
   ensureDocxLoaded();
   wbPopulateAthleteDropdown();
   ['tb', 'rj', 'wb'].forEach(function(prefix) {
@@ -3382,7 +2797,6 @@ function clinUnlockAll() {
 }
 
 function tbInitGate() {
-  if (sessionStorage.getItem('aamClinUnlocked') === '1') clinUnlockAll();
   ['tb', 'rj', 'wb'].forEach(function(prefix) {
     var inp = document.getElementById(prefix + '-code-input');
     if (inp) inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') checkClinCode(prefix); });
@@ -3402,7 +2816,8 @@ function tbInitGate() {
 function tbInitDayCheckboxes() {
   ['tb-days', 'rj-days'].forEach(function(wrapId) {
     var wrap = document.getElementById(wrapId);
-    if (!wrap) return;
+    if (!wrap || wrap.getAttribute('data-aam-init')) return;
+    wrap.setAttribute('data-aam-init', '1');
     var defaults = wrapId === 'rj-days' ? ['2', '4'] : ['1', '3', '5']; // RJ defaults Tue/Thu, throwing defaults Mon/Wed/Fri
     wrap.querySelectorAll('.day-check').forEach(function(el) {
       if (defaults.indexOf(el.getAttribute('data-day')) >= 0) el.classList.add('sel');
@@ -3411,922 +2826,7 @@ function tbInitDayCheckboxes() {
   });
 }
 
-// ---- PROGRAM TEMPLATES ----
-// unit: 'session' (assigned to next selected throwing day) or 'week' (assigned weekly, used for the mound/bullpen phase)
-var tbTemplates = {
-  flatground: { phase: 'Return to Throw \u2014 Flat Ground Progression', items: [
-    { unit: 'session', activity: 'Flat Ground Catch Play', volume: '20 throws', intent: '50%', notes: '45 ft \u2014 focus on mechanics, stop at first sign of discomfort' },
-    { unit: 'session', activity: 'Flat Ground Catch Play', volume: '25 throws', intent: '50%', notes: '45-60 ft' },
-    { unit: 'session', activity: 'Flat Ground Catch Play', volume: '25 throws', intent: '50-60%', notes: '60 ft' },
-    { unit: 'session', activity: 'Flat Ground Catch Play', volume: '30 throws', intent: '60%', notes: '60-75 ft' },
-    { unit: 'session', activity: 'Flat Ground Catch Play', volume: '30 throws', intent: '60-70%', notes: '75-90 ft' },
-    { unit: 'session', activity: 'Flat Ground Catch Play', volume: '30 throws', intent: '70%', notes: '90 ft \u2014 progress to Long Toss if pain-free' }
-  ]},
-  longtoss: { phase: 'Long Toss Build-Up', items: [
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '60-70%', notes: 'Build to 60 ft, crow hop mechanics' },
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '65-75%', notes: 'Build to 75 ft' },
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '70-80%', notes: 'Build to 90 ft' },
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '75-85%', notes: 'Build to 105 ft' },
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '80-85%', notes: 'Build to 120 ft (standard ceiling)' },
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '80-85%', notes: 'Hold at 120 ft' },
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '80-85%', notes: 'Hold at 120 ft \u2014 add pull-downs only if prescribed' },
-    { unit: 'session', activity: 'Long Toss', volume: '25-30 throws', intent: '80-85%', notes: 'Hold at 120 ft \u2014 progress to Mound if pain-free' }
-  ]},
-  mound: { phase: 'Mound / Bullpen Progression', items: [
-    { unit: 'week', activity: 'Flat Ground', volume: '20', intent: '50%', notes: 'Reintroduce throwing mechanics and rhythm' },
-    { unit: 'week', activity: 'Flat Ground', volume: '20-25', intent: '50-70%', notes: 'Build consistency, gradually increase intent' },
-    { unit: 'week', activity: 'Bullpen', volume: '15', intent: '50%', notes: 'Restore mound familiarity at low intent' },
-    { unit: 'week', activity: 'Bullpen', volume: '30', intent: '50%', notes: 'Increase mound volume, same intensity' },
-    { unit: 'week', activity: 'Bullpen', volume: '45', intent: '50-70%', notes: 'Introduce controlled intent, clean mechanics' },
-    { unit: 'week', activity: 'Bullpen', volume: '60', intent: '70%', notes: 'Increase intent, preserve arm elasticity' },
-    { unit: 'week', activity: 'Bullpen', volume: '20', intent: '100%', notes: 'First exposure to full intent, low volume' },
-    { unit: 'week', activity: 'Bullpen', volume: '30', intent: '100%', notes: 'Prepare CNS for sustained full-intent throwing' },
-    { unit: 'week', activity: 'Bullpen', volume: '40', intent: '100%', notes: 'Transition to competitive throwing' },
-    { unit: 'week', activity: 'Bullpen', volume: '50', intent: '100%', notes: 'Build volume to withstand normal workloads' }
-  ]},
-  custom: { phase: null, items: [] }
-};
-tbTemplates.full = { segments: ['flatground', 'longtoss', 'mound'] };
-
-function tbAddDays(date, n) { var d = new Date(date); d.setDate(d.getDate() + n); return d; }
-function tbFmtDate(d) { return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
-
-function tbBuildRows(templateKey, startDateStr, selectedDays) {
-  var start = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date();
-  var segments = templateKey === 'full' ? tbTemplates.full.segments : [templateKey];
-  var days = selectedDays.length ? selectedDays.slice().sort(function(a,b){return a-b;}) : [1,3,5];
-
-  var rows = [];
-  var dayPtr = new Date(start);
-  var sessionNum = 0, weekNum = 0;
-
-  function nextSessionDate() {
-    while (days.indexOf(dayPtr.getDay()) === -1) { dayPtr = tbAddDays(dayPtr, 1); }
-    var d = new Date(dayPtr);
-    dayPtr = tbAddDays(dayPtr, 1);
-    return d;
-  }
-
-  segments.forEach(function(segKey) {
-    var seg = tbTemplates[segKey];
-    if (!seg || !seg.items.length) return;
-    rows.push({ phaseHeader: seg.phase });
-    seg.items.forEach(function(item) {
-      var dayLabel, dateLabel;
-      if (item.unit === 'week') {
-        weekNum++;
-        dayLabel = 'Week ' + weekNum;
-        var d = nextSessionDate();
-        dateLabel = tbFmtDate(d);
-      } else {
-        sessionNum++;
-        var d2 = nextSessionDate();
-        dayLabel = 'Session ' + sessionNum;
-        dateLabel = tbFmtDate(d2);
-      }
-      rows.push({ day: dayLabel, date: dateLabel, activity: item.activity, volume: item.volume, intent: item.intent, notes: item.notes });
-    });
-  });
-  return rows;
-}
-
-function generateThrowProgram() {
-  var templateKey = document.getElementById('tb-template').value;
-  var startDateStr = document.getElementById('tb-startdate').value;
-  var selectedDays = [];
-  document.querySelectorAll('#tb-days .day-check.sel').forEach(function(el) { selectedDays.push(parseInt(el.getAttribute('data-day'), 10)); });
-
-  var body = document.getElementById('tb-table-body');
-  body.innerHTML = '';
-
-  if (templateKey === 'custom') {
-    addTbRow();
-    return;
-  }
-
-  var rows = tbBuildRows(templateKey, startDateStr, selectedDays);
-  rows.forEach(function(r) {
-    if (r.phaseHeader) {
-      var tr = document.createElement('tr');
-      tr.className = 'tb-phase-row';
-      tr.innerHTML = '<td colspan="7">' + r.phaseHeader + '</td>';
-      body.appendChild(tr);
-      return;
-    }
-    body.appendChild(tbMakeRow(r.day, r.date, r.activity, r.volume, r.intent, r.notes));
-  });
-}
-
-function tbMakeRow(day, date, activity, volume, intent, notes) {
-  var tr = document.createElement('tr');
-  tr.innerHTML =
-    '<td contenteditable="true">' + (day || '') + '</td>' +
-    '<td contenteditable="true">' + (date || '') + '</td>' +
-    '<td contenteditable="true">' + (activity || '') + '</td>' +
-    '<td contenteditable="true">' + (volume || '') + '</td>' +
-    '<td contenteditable="true">' + (intent || '') + '</td>' +
-    '<td contenteditable="true">' + (notes || '') + '</td>' +
-    '<td><button class="tb-del" onclick="this.closest(\'tr\').remove()">&times;</button></td>';
-  return tr;
-}
-
-function addTbRow() {
-  var body = document.getElementById('tb-table-body');
-  var placeholder = body.querySelector('td[colspan]');
-  if (placeholder) body.innerHTML = '';
-  body.appendChild(tbMakeRow('', '', '', '', '', ''));
-}
-
-// ---- DOCX EXPORT ----
-async function exportThrowProgramDocx() {
-  var btn = event && event.target;
-  if (btn) { btn.disabled = true; btn.textContent = 'Loading document engine...'; }
-  var loaded = await ensureDocxLoaded();
-  if (btn) { btn.disabled = false; btn.textContent = 'Generate Word Document (AAM Letterhead)'; }
-  if (!loaded || typeof docx === 'undefined') {
-    alert('Could not load the document engine from any source. Check your internet connection and try again.');
-    return;
-  }
-  var name = document.getElementById('tb-name').value.trim() || 'Patient Name Not Entered';
-  var dx = document.getElementById('tb-dx').value.trim();
-  var notes = document.getElementById('tb-notes').value.trim();
-  var startDateStr = document.getElementById('tb-startdate').value;
-  var startLabel = startDateStr ? tbFmtDate(new Date(startDateStr + 'T00:00:00')) : tbFmtDate(new Date());
-
-  var bodyRows = Array.prototype.slice.call(document.querySelectorAll('#tb-table-body tr'));
-  if (!bodyRows.length || (bodyRows.length === 1 && bodyRows[0].querySelector('td[colspan]'))) {
-    alert('Generate or build a program table before exporting.');
-    return;
-  }
-
-  var NAVY = '0F1E35', GOLD = 'C9A84C', GRAY = '4A4A52';
-  var D = docx;
-
-  var tableRows = [];
-  tableRows.push(new D.TableRow({
-    tableHeader: true,
-    children: ['Day/Week','Date','Activity','Volume','Intent','Notes'].map(function(h) {
-      return new D.TableCell({
-        shading: { fill: NAVY },
-        children: [new D.Paragraph({ children: [new D.TextRun({ text: h, bold: true, color: 'FFFFFF', size: 18 })] })]
-      });
-    })
-  }));
-
-  bodyRows.forEach(function(tr) {
-    var cells = tr.querySelectorAll('td');
-    if (tr.classList.contains('tb-phase-row')) {
-      tableRows.push(new D.TableRow({
-        children: [new D.TableCell({
-          columnSpan: 6,
-          shading: { fill: 'FDF8DC' },
-          children: [new D.Paragraph({ children: [new D.TextRun({ text: cells[0].textContent, bold: true, color: '7A6000', size: 18 })] })]
-        })]
-      }));
-      return;
-    }
-    var vals = [];
-    for (var i = 0; i < 6; i++) vals.push(cells[i] ? cells[i].textContent : '');
-    tableRows.push(new D.TableRow({
-      children: vals.map(function(v, idx) {
-        return new D.TableCell({
-          children: [new D.Paragraph({ children: [new D.TextRun({ text: v, size: 18, bold: idx === 0 })] })]
-        });
-      })
-    }));
-  });
-
-  var children = [];
-
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'ADVANCED ATHLETIC MEDICINE', bold: true, color: NAVY, size: 32 })] }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'Individualized Throwing Program', italics: true, color: GOLD, size: 20 })], spacing: { after: 100 } }));
-  children.push(new D.Paragraph({ border: { bottom: { color: GOLD, space: 1, style: D.BorderStyle.SINGLE, size: 12 } }, spacing: { after: 200 } }));
-
-  var infoRows = [['Patient Name', name], ['Program Start Date', startLabel], ['Diagnosis / Reason', dx || '-'], ['Prescribing Clinician', 'Matthew Cannella, MBA, MS, LAT, ATC'], ['Clinic', 'Advanced Athletic Medicine']];
-  children.push(new D.Table({
-    width: { size: 100, type: D.WidthType.PERCENTAGE },
-    rows: infoRows.map(function(pair) {
-      return new D.TableRow({ children: [
-        new D.TableCell({ width: { size: 30, type: D.WidthType.PERCENTAGE }, children: [new D.Paragraph({ children: [new D.TextRun({ text: pair[0], bold: true, color: NAVY, size: 18 })] })] }),
-        new D.TableCell({ children: [new D.Paragraph({ children: [new D.TextRun({ text: pair[1], size: 18 })] })] })
-      ]});
-    }),
-    borders: {
-      top: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      bottom: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      left: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      right: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      insideHorizontal: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      insideVertical: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' }
-    }
-  }));
-
-  children.push(new D.Paragraph({ text: '', spacing: { after: 200 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'PROGRAM', bold: true, color: NAVY, size: 22 })], spacing: { after: 120 } }));
-  children.push(new D.Table({ width: { size: 100, type: D.WidthType.PERCENTAGE }, rows: tableRows }));
-
-  if (notes) {
-    children.push(new D.Paragraph({ text: '', spacing: { after: 200 } }));
-    children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'CLINICIAN NOTES & RESTRICTIONS', bold: true, color: NAVY, size: 20 })], spacing: { after: 100 } }));
-    children.push(new D.Paragraph({ children: [new D.TextRun({ text: notes, size: 18, color: GRAY })] }));
-  }
-
-  children.push(new D.Paragraph({ text: '', spacing: { after: 200 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'WHEN TO STOP', bold: true, color: 'C8402A', size: 20 })], spacing: { after: 100 } }));
-  ['Sharp or worsening pain during or after throwing', 'Ulnar-sided elbow pain, numbness, or tingling into the hand', 'Loss of command or noticeable mechanical breakdown', 'Any of the above: stop throwing and contact AAM before the next session'].forEach(function(t) {
-    children.push(new D.Paragraph({ bullet: { level: 0 }, children: [new D.TextRun({ text: t, size: 18 })] }));
-  });
-
-  children.push(new D.Paragraph({ text: '', spacing: { before: 400, after: 300 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'Clinician Signature: ________________________________          Date: _______________', size: 18 })], spacing: { after: 100 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'Matthew Cannella, MBA, MS, LAT, ATC \u2014 Advanced Athletic Medicine', bold: true, size: 18, color: NAVY })] }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'mcannella@advancedathleticmed.onmicrosoft.com', size: 16, color: GRAY })], spacing: { after: 200 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'This throwing program is individualized clinical guidance provided by Advanced Athletic Medicine and should be followed under the direction of the prescribing clinician. It is not a substitute for in-person evaluation.', italics: true, size: 14, color: '7A7A85' })] }));
-
-  var doc = new D.Document({ sections: [{ properties: {}, children: children }] });
-
-  D.Packer.toBlob(doc).then(function(blob) {
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    var safeName = name.replace(/[^a-z0-9]+/gi, '_');
-    a.href = url;
-    a.download = 'AAM_Throwing_Program_' + safeName + '.docx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    var msg = document.getElementById('tb-export-msg');
-    msg.style.display = 'block';
-    setTimeout(function() { msg.style.display = 'none'; }, 3000);
-  }).catch(function(err) {
-    console.error(err);
-    alert('There was a problem generating the document. Please try again.');
-  });
-}
-
-// ============================================================
-// RUN/JUMP PROGRESSION BUILDER (CLINICAL STAFF TOOL)
-// ============================================================
-
-var rjTemplates = {
-  plyo: { phase: 'Plyometric Progression', items: [
-    { unit: 'session', activity: 'Simple Double Limb Plyometrics', volume: 'Limit 60 ft contacts/workout', intent: 'Low', notes: 'Double Leg Hops (fwd/back over line); Box Jumps (6-8 in max). Focus on sticking each landing with good form in frontal and sagittal planes - soft landing, eccentric control.' },
-    { unit: 'session', activity: 'Complex Double Limb Plyometrics', volume: 'Limit 90 ft contacts/workout', intent: 'Low-Mod', notes: 'Double leg jump for distance; for height; with 90/180 deg turn; Depth Jumps (6-8 in max).' },
-    { unit: 'session', activity: 'Combination Jumps (Double Leg)', volume: 'Limit 90 ft contacts/workout', intent: 'Mod', notes: 'Repetitive double leg jumps (distance, height, lateral, turns); jump for distance into jump for height; box jump to depth jump; depth jump to jump for distance/height. String jumps together - move quickly from jump to jump.' },
-    { unit: 'session', activity: 'Single Limb Plyometrics', volume: 'Limit 100-120 ft contacts/workout', intent: 'Mod-High', notes: 'Heiden Hop; Bounding; single leg jumps (distance, height, lateral, 90/180 deg turn); single leg box jumps (6-8 in max); single leg depth jumps (6-8 in max). Stick each landing - soft landing, eccentric control.' },
-    { unit: 'session', activity: 'Combination Jumps (Single Leg)', volume: 'Limit 100-120 ft contacts/workout', intent: 'High', notes: 'Repetitive single leg jumps (distance, height, lateral, 90/180 deg turn); jump for distance into jump for height; box jump to depth jump; depth jump to jump for distance/height. String jumps together - move quickly from jump to jump.' }
-  ]},
-  speedcod: { phase: 'Speed & Change of Direction Progression', items: [
-    { unit: 'week', activity: 'Linear Sprint Progression', volume: '10 reps', intent: '1/2 speed', notes: 'Sprint 50-100 yds at 1/2 speed x10' },
-    { unit: 'week', activity: 'Linear Sprint Progression', volume: '10 reps', intent: '1/2-3/4 speed', notes: 'Sprint 50-100 yds at 1/2 speed x5; Sprint 50-100 yds at 3/4 speed x5' },
-    { unit: 'week', activity: 'Linear Sprint + Backpedal', volume: '17 reps', intent: '1/2-full speed', notes: 'Sprint 100 yds 1/2 speed x2; Sprint 100 yds 3/4 speed x5; Sprint 50-100 yds full speed x5; Backpedal 50 yds 1/2 speed x5' },
-    { unit: 'week', activity: 'Linear Sprint + Backpedal', volume: '13 reps', intent: '1/2-full speed', notes: 'Sprint 100 yds 1/2 speed x1; Sprint 100 yds 3/4 speed x2; Sprint 50 yds full speed x5; Sprint 100 yds full speed x5; Backpedal 50 yds 3/4 speed x5' },
-    { unit: 'week', activity: 'Change of Direction - Intro', volume: '6 reps', intent: '1/2 speed', notes: 'Warm-up: sprint/backpedal 50 yds (2 reps 1/2 speed, 5 reps full speed). T-Drill 3 reps 1/2 speed forward; Backpedal shuttle 5/10/20 yd 3 reps 1/2 speed' },
-    { unit: 'week', activity: 'Change of Direction - Build', volume: '9 reps', intent: 'Full speed', notes: 'T-Drill 3 reps full speed; Forward/backpedal shuttle 5/10/20 yd 3 reps full speed; Box drill with shuffling 3 reps 1/2 speed' },
-    { unit: 'week', activity: 'Change of Direction - Advance', volume: '12 reps', intent: '3/4-full speed', notes: 'Box drill with shuffling 3 reps full speed; 10-yard shuttle (quick direction change) 3 reps full speed; Z-drill 6 reps 3/4 speed' },
-    { unit: 'week', activity: 'Change of Direction - Full Speed', volume: '12 reps', intent: 'Full speed', notes: 'Box drill with cuts 3 reps full speed; 10-yard shuttle (quick direction change) 3 reps full speed; Z-drill 6 reps full speed' }
-  ]},
-  custom: { phase: null, items: [] }
-};
-rjTemplates.full = { segments: ['plyo', 'speedcod'] };
-
-function rjBuildRows(templateKey, startDateStr, selectedDays) {
-  var start = startDateStr ? new Date(startDateStr + 'T00:00:00') : new Date();
-  var segments = templateKey === 'full' ? rjTemplates.full.segments : [templateKey];
-  var days = selectedDays.length ? selectedDays.slice().sort(function(a,b){return a-b;}) : [2,4];
-
-  var rows = [];
-  var dayPtr = new Date(start);
-  var sessionNum = 0, weekNum = 0;
-
-  function nextSessionDate() {
-    while (days.indexOf(dayPtr.getDay()) === -1) { dayPtr = tbAddDays(dayPtr, 1); }
-    var d = new Date(dayPtr);
-    dayPtr = tbAddDays(dayPtr, 1);
-    return d;
-  }
-
-  segments.forEach(function(segKey) {
-    var seg = rjTemplates[segKey];
-    if (!seg || !seg.items.length) return;
-    rows.push({ phaseHeader: seg.phase });
-    seg.items.forEach(function(item) {
-      var dayLabel, dateLabel;
-      if (item.unit === 'week') {
-        weekNum++;
-        dayLabel = 'Week ' + weekNum;
-        var d = nextSessionDate();
-        dateLabel = tbFmtDate(d);
-      } else {
-        sessionNum++;
-        var d2 = nextSessionDate();
-        dayLabel = 'Session ' + sessionNum;
-        dateLabel = tbFmtDate(d2);
-      }
-      rows.push({ day: dayLabel, date: dateLabel, activity: item.activity, volume: item.volume, intent: item.intent, notes: item.notes });
-    });
-  });
-  return rows;
-}
-
-function generateRunJumpProgram() {
-  var templateKey = document.getElementById('rj-template').value;
-  var startDateStr = document.getElementById('rj-startdate').value;
-  var selectedDays = [];
-  document.querySelectorAll('#rj-days .day-check.sel').forEach(function(el) { selectedDays.push(parseInt(el.getAttribute('data-day'), 10)); });
-
-  var body = document.getElementById('rj-table-body');
-  body.innerHTML = '';
-
-  if (templateKey === 'custom') {
-    addRjRow();
-    return;
-  }
-
-  var rows = rjBuildRows(templateKey, startDateStr, selectedDays);
-  rows.forEach(function(r) {
-    if (r.phaseHeader) {
-      var tr = document.createElement('tr');
-      tr.className = 'tb-phase-row';
-      tr.innerHTML = '<td colspan="7">' + r.phaseHeader + '</td>';
-      body.appendChild(tr);
-      return;
-    }
-    body.appendChild(tbMakeRow(r.day, r.date, r.activity, r.volume, r.intent, r.notes));
-  });
-}
-
-function addRjRow() {
-  var body = document.getElementById('rj-table-body');
-  var placeholder = body.querySelector('td[colspan]');
-  if (placeholder) body.innerHTML = '';
-  body.appendChild(tbMakeRow('', '', '', '', '', ''));
-}
-
-async function exportRunJumpProgramDocx() {
-  var btn = event && event.target;
-  if (btn) { btn.disabled = true; btn.textContent = 'Loading document engine...'; }
-  var loaded = await ensureDocxLoaded();
-  if (btn) { btn.disabled = false; btn.textContent = 'Generate Word Document (AAM Letterhead)'; }
-  if (!loaded || typeof docx === 'undefined') {
-    alert('Could not load the document engine from any source. Check your internet connection and try again.');
-    return;
-  }
-  var name = document.getElementById('rj-name').value.trim() || 'Patient Name Not Entered';
-  var dx = document.getElementById('rj-dx').value.trim();
-  var notes = document.getElementById('rj-notes').value.trim();
-  var startDateStr = document.getElementById('rj-startdate').value;
-  var startLabel = startDateStr ? tbFmtDate(new Date(startDateStr + 'T00:00:00')) : tbFmtDate(new Date());
-
-  var bodyRows = Array.prototype.slice.call(document.querySelectorAll('#rj-table-body tr'));
-  if (!bodyRows.length || (bodyRows.length === 1 && bodyRows[0].querySelector('td[colspan]'))) {
-    alert('Generate or build a program table before exporting.');
-    return;
-  }
-
-  var NAVY = '0F1E35', GOLD = 'C9A84C', GRAY = '4A4A52';
-  var D = docx;
-
-  var tableRows = [];
-  tableRows.push(new D.TableRow({
-    tableHeader: true,
-    children: ['Day/Week','Date','Activity','Volume','Intent','Notes'].map(function(h) {
-      return new D.TableCell({
-        shading: { fill: NAVY },
-        children: [new D.Paragraph({ children: [new D.TextRun({ text: h, bold: true, color: 'FFFFFF', size: 18 })] })]
-      });
-    })
-  }));
-
-  bodyRows.forEach(function(tr) {
-    var cells = tr.querySelectorAll('td');
-    if (tr.classList.contains('tb-phase-row')) {
-      tableRows.push(new D.TableRow({
-        children: [new D.TableCell({
-          columnSpan: 6,
-          shading: { fill: 'FDF8DC' },
-          children: [new D.Paragraph({ children: [new D.TextRun({ text: cells[0].textContent, bold: true, color: '7A6000', size: 18 })] })]
-        })]
-      }));
-      return;
-    }
-    var vals = [];
-    for (var i = 0; i < 6; i++) vals.push(cells[i] ? cells[i].textContent : '');
-    tableRows.push(new D.TableRow({
-      children: vals.map(function(v, idx) {
-        return new D.TableCell({
-          children: [new D.Paragraph({ children: [new D.TextRun({ text: v, size: 18, bold: idx === 0 })] })]
-        });
-      })
-    }));
-  });
-
-  var children = [];
-
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'ADVANCED ATHLETIC MEDICINE', bold: true, color: NAVY, size: 32 })] }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'Individualized Run/Jump Progression', italics: true, color: GOLD, size: 20 })], spacing: { after: 100 } }));
-  children.push(new D.Paragraph({ border: { bottom: { color: GOLD, space: 1, style: D.BorderStyle.SINGLE, size: 12 } }, spacing: { after: 200 } }));
-
-  var infoRows = [['Patient Name', name], ['Program Start Date', startLabel], ['Diagnosis / Reason', dx || '-'], ['Prescribing Clinician', 'Matthew Cannella, MBA, MS, LAT, ATC'], ['Clinic', 'Advanced Athletic Medicine']];
-  children.push(new D.Table({
-    width: { size: 100, type: D.WidthType.PERCENTAGE },
-    rows: infoRows.map(function(pair) {
-      return new D.TableRow({ children: [
-        new D.TableCell({ width: { size: 30, type: D.WidthType.PERCENTAGE }, children: [new D.Paragraph({ children: [new D.TextRun({ text: pair[0], bold: true, color: NAVY, size: 18 })] })] }),
-        new D.TableCell({ children: [new D.Paragraph({ children: [new D.TextRun({ text: pair[1], size: 18 })] })] })
-      ]});
-    }),
-    borders: {
-      top: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      bottom: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      left: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      right: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      insideHorizontal: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' },
-      insideVertical: { style: D.BorderStyle.NONE, size: 0, color: 'FFFFFF' }
-    }
-  }));
-
-  children.push(new D.Paragraph({ text: '', spacing: { after: 200 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'PROGRAM', bold: true, color: NAVY, size: 22 })], spacing: { after: 120 } }));
-  children.push(new D.Table({ width: { size: 100, type: D.WidthType.PERCENTAGE }, rows: tableRows }));
-
-  if (notes) {
-    children.push(new D.Paragraph({ text: '', spacing: { after: 200 } }));
-    children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'CLINICIAN NOTES & RESTRICTIONS', bold: true, color: NAVY, size: 20 })], spacing: { after: 100 } }));
-    children.push(new D.Paragraph({ children: [new D.TextRun({ text: notes, size: 18, color: GRAY })] }));
-  }
-
-  children.push(new D.Paragraph({ text: '', spacing: { after: 200 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'WHEN TO STOP', bold: true, color: 'C8402A', size: 20 })], spacing: { after: 100 } }));
-  ['Increased pain, swelling, or effusion in the involved limb', 'Loss of landing control or valgus (knee cave) on cutting or jumping', 'Sharp pain during running, cutting, or jumping', 'Any of the above: stop training and contact AAM before the next session'].forEach(function(t) {
-    children.push(new D.Paragraph({ bullet: { level: 0 }, children: [new D.TextRun({ text: t, size: 18 })] }));
-  });
-
-  children.push(new D.Paragraph({ text: '', spacing: { before: 400, after: 300 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'Clinician Signature: ________________________________          Date: _______________', size: 18 })], spacing: { after: 100 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'Matthew Cannella, MBA, MS, LAT, ATC \u2014 Advanced Athletic Medicine', bold: true, size: 18, color: NAVY })] }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'mcannella@advancedathleticmed.onmicrosoft.com', size: 16, color: GRAY })], spacing: { after: 200 } }));
-  children.push(new D.Paragraph({ children: [new D.TextRun({ text: 'This program is individualized clinical guidance provided by Advanced Athletic Medicine and should be followed under the direction of the prescribing clinician. It is not a substitute for in-person evaluation.', italics: true, size: 14, color: '7A7A85' })] }));
-
-  var doc = new D.Document({ sections: [{ properties: {}, children: children }] });
-
-  D.Packer.toBlob(doc).then(function(blob) {
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    var safeName = name.replace(/[^a-z0-9]+/gi, '_');
-    a.href = url;
-    a.download = 'AAM_RunJump_Progression_' + safeName + '.docx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    var msg = document.getElementById('rj-export-msg');
-    msg.style.display = 'block';
-    setTimeout(function() { msg.style.display = 'none'; }, 3000);
-  }).catch(function(err) {
-    console.error(err);
-    alert('There was a problem generating the document. Please try again.');
-  });
-}
-
-
-var EX_LIB=[
-{id:0,cat:'T-Spine Mobility',name:'Cat / Cow',ds:'1',dr:'10',instr:'Move slowly through flexion and extension with breathing throughout'},
-{id:1,cat:'T-Spine Mobility',name:'Foam Roll Extension',ds:'1',dr:'Each T-Spine level',instr:'Extend over the roller, support head, avoid low back'},
-{id:2,cat:'T-Spine Mobility',name:'Side Lying Open Books',ds:'1',dr:'10 ea',instr:'Rotate upper arm open, keep knees stacked'},
-{id:3,cat:'T-Spine Mobility',name:'Quadruped T-Spine Rotation',ds:'1',dr:'10 ea',instr:'Rotate through upper back, hips stay square, reach as far as you can'},
-{id:4,cat:'T-Spine Mobility',name:'Quadruped Thread the Needle',ds:'1',dr:'10 ea',instr:'Rotate through upper back, hips stay square'},
-{id:5,cat:'T-Spine Mobility',name:'Standing T-Spine Rotation',ds:'1',dr:'10 ea',instr:'Rotate chest side to side without leaning'},
-{id:6,cat:'Soft Tissue',name:'Hamstring',ds:'1',dr:'15-30 sec',instr:'Slow rolls, pause on tight areas; hook uninvolved side if able'},
-{id:7,cat:'Soft Tissue',name:'Calf',ds:'1',dr:'15-30 sec',instr:'Work ankle to knee, hook uninvolved leg for more pressure'},
-{id:8,cat:'Soft Tissue',name:'Quad',ds:'1',dr:'15-30 sec',instr:'Roll hip to knee, controlled pressure'},
-{id:9,cat:'Soft Tissue',name:'IT Band',ds:'1',dr:'15-30 sec',instr:'Light pressure, slow movement'},
-{id:10,cat:'Soft Tissue',name:'Glute',ds:'1',dr:'15-30 sec',instr:'Cross leg, roll side to side'},
-{id:11,cat:'Soft Tissue',name:'Adductor',ds:'1',dr:'15-30 sec',instr:'Gentle pressure, short range'},
-{id:12,cat:'Soft Tissue',name:'Lat',ds:'1',dr:'15-30 sec',instr:'Side-lying, roll arm pit to mid-back'},
-{id:13,cat:'Soft Tissue',name:'T-Spine Extension',ds:'1',dr:'15-30 sec',instr:'Roll mid-back only, support neck'},
-{id:14,cat:'Soft Tissue',name:'Pec Stretch',ds:'1',dr:'15-30 sec',instr:'Roller parallel to spine, stretching the pec'},
-{id:15,cat:'Static Stretching',name:'Active Hamstring',ds:'1',dr:'10',instr:'Extend the leg while holding the back of the thigh throughout'},
-{id:16,cat:'Static Stretching',name:'3-Way Hamstring',ds:'3',dr:'30 sec',instr:'Stretch in 3 angles: straight, across body, outward'},
-{id:17,cat:'Static Stretching',name:'Side Lying Quad',ds:'3',dr:'30 sec',instr:'On your side, pull heel toward glute, hips stacked'},
-{id:18,cat:'Static Stretching',name:'Doorway Pec',ds:'3',dr:'30 sec',instr:'Elbow at shoulder height, lean through; try different angles'},
-{id:19,cat:'Static Stretching',name:'Corner Stretch',ds:'3',dr:'30 sec',instr:'Lean forward slightly, stretch chest and shoulders'},
-{id:20,cat:'Static Stretching',name:'Modified Sleeper Stretch',ds:'3',dr:'30 sec',instr:'Shoulders stacked, pin chin to shoulder, move arm into IR - no forcing, no pain'},
-{id:21,cat:'Static Stretching',name:'Modified Cross Body Stretch',ds:'3',dr:'30 sec',instr:'Shoulders stacked, pull arm across chest'},
-{id:22,cat:'Static Stretching',name:'Kneeling Hip Flexor (Couch Stretch)',ds:'3',dr:'30 sec',instr:'Squeeze glute, keep ribs down, shift hips forward using chair'},
-{id:23,cat:'Static Stretching',name:'Frog Stretch',ds:'3',dr:'30 sec',instr:'Sit hips back, stretch inner thighs'},
-{id:24,cat:'Static Stretching',name:'World\'s Greatest Stretch',ds:'3',dr:'30 sec',instr:'Step forward, rotate toward lead leg, smooth motion'},
-{id:25,cat:'Dynamic Warm-Up',name:'Lateral Shuffle',ds:'1',dr:'15 yd',instr:'Stay low, chest tall, do not cross feet'},
-{id:26,cat:'Dynamic Warm-Up',name:'Carioca',ds:'1',dr:'15 yd',instr:'Rotate through the hips and trunk, stay relaxed'},
-{id:27,cat:'Dynamic Warm-Up',name:'Walking Lunges',ds:'1',dr:'15 yd',instr:'Long stride, knee in line with toes, chest upright'},
-{id:28,cat:'Dynamic Warm-Up',name:'Reverse Lunge with Rotation',ds:'1',dr:'15 yd',instr:'Step back, rotate toward lead leg, control movement'},
-{id:29,cat:'Dynamic Warm-Up',name:'Lateral Lunge',ds:'1',dr:'15 yd',instr:'Sit back in hips, keep opposite leg straight, push back to center'},
-{id:30,cat:'Dynamic Warm-Up',name:'High Knees',ds:'1',dr:'15 yd',instr:'Drive knees up under control, maintain good posture'},
-{id:31,cat:'Dynamic Warm-Up',name:'Butt Kicks',ds:'1',dr:'15 yd',instr:'Quick heel to glute motion, stay tall'},
-{id:32,cat:'Dynamic Warm-Up',name:'Standing Trunk Rotation',ds:'1',dr:'15 yd',instr:'Rotate through the thoracic spine, hips stay mostly forward'},
-{id:33,cat:'Dynamic Warm-Up',name:'Bent Over Open Books',ds:'1',dr:'15 yd',instr:'Rotate upper body while keeping hips stable'},
-{id:34,cat:'Dynamic Warm-Up',name:'Hip Hinge and Reach',ds:'1',dr:'15 yd',instr:'Hinge at hips, neutral spine, reach forward with arms'},
-{id:35,cat:'Dynamic Warm-Up',name:'Arm Swings Forward to Back',ds:'1',dr:'10',instr:'Relaxed arm motion, full range, not forcing motion'},
-{id:36,cat:'Dynamic Warm-Up',name:'Arm Swings Side to Side',ds:'1',dr:'10',instr:'Relaxed arm motion, full range, not forcing motion'},
-{id:37,cat:'Dynamic Warm-Up',name:'Arm Circles (Small and Large)',ds:'1',dr:'10',instr:'Controlled circles, gradually increase size'},
-{id:38,cat:'Dynamic Warm-Up',name:'Serratus Push Ups',ds:'1',dr:'10',instr:'Keep arms straight, move shoulder blades only'},
-{id:39,cat:'Dynamic Warm-Up',name:'Shoulder Rolls',ds:'1',dr:'10 ea',instr:'Smooth rolls forward and backward, relaxed motion'},
-{id:40,cat:'Pre-Throw Bands',name:'Wrist Flexion',ds:'1',dr:'8',instr:'Neutral hand, palms up, flex the wrist - slow and controlled'},
-{id:41,cat:'Pre-Throw Bands',name:'Wrist Extension',ds:'1',dr:'8',instr:'Neutral hand, palms down, extend the wrist - slow and controlled'},
-{id:42,cat:'Pre-Throw Bands',name:'Bicep Curl',ds:'1',dr:'8',instr:'Maintain good posture, bend at the elbow, contracting the bicep'},
-{id:43,cat:'Pre-Throw Bands',name:'Tricep Extension',ds:'1',dr:'8',instr:'Lock upper arm, extend through the elbow only'},
-{id:44,cat:'Pre-Throw Bands',name:'Scaption',ds:'1',dr:'8',instr:'Thumbs up, raise arms to 90 degrees, just outside of neutral'},
-{id:45,cat:'Pre-Throw Bands',name:'Low Row',ds:'1',dr:'8',instr:'Pull elbows back, squeeze shoulder blades'},
-{id:46,cat:'Pre-Throw Bands',name:'High Row',ds:'1',dr:'8',instr:'Pull elbows high, avoid shrugging'},
-{id:47,cat:'Pre-Throw Bands',name:'"I"',ds:'1',dr:'8',instr:'Straight arms, lift with control'},
-{id:48,cat:'Pre-Throw Bands',name:'"Y"',ds:'1',dr:'8',instr:'Lift arms at overhead angle, slow movement'},
-{id:49,cat:'Pre-Throw Bands',name:'"T"',ds:'1',dr:'8',instr:'Arms out to the side, squeeze between shoulder blades'},
-{id:50,cat:'Pre-Throw Bands',name:'Shoulder "A"',ds:'1',dr:'8',instr:'Elbow level with shoulder, small controlled motion'},
-{id:51,cat:'Pre-Throw Bands',name:'Shoulder Extension',ds:'1',dr:'8',instr:'Pull arm back without arching, squeezing shoulder blades'},
-{id:52,cat:'Pre-Throw Bands',name:'Shoulder "W" Robber',ds:'1',dr:'8',instr:'Pull elbows back, rotate hands outward'},
-{id:53,cat:'Pre-Throw Bands',name:'Shoulder Adduction',ds:'1',dr:'8',instr:'Pull arm down toward body, control movement'},
-{id:54,cat:'Pre-Throw Bands',name:'Overhead Lat Traction Activation',ds:'1',dr:'8',instr:'Half knee, straight back, pull down and rotate'},
-{id:55,cat:'Post-Throw Bands',name:'"A" Hold',ds:'1',dr:'8',instr:'Arms overhead, hands at the side of your head, hold'},
-{id:56,cat:'Post-Throw Bands',name:'External Rotation @ 90/90 Hold',ds:'1',dr:'8',instr:'Arms at 90/90, sustained hold'},
-{id:57,cat:'Post-Throw Bands',name:'"T" Hold',ds:'1',dr:'8',instr:'Arms out to the side, squeeze shoulder blades and hold'},
-{id:58,cat:'Post-Throw Bands',name:'Shoulder Extension Hold',ds:'1',dr:'8',instr:'Straight arms, pull shoulder blades back and hold'},
-{id:59,cat:'Post-Throw Bands',name:'Bicep Curl Hold @ 90/90',ds:'1',dr:'8',instr:'At your side, maintain a bicep curl with the shoulder at 90 degrees'},
-{id:60,cat:'Post-Throw Bands',name:'Wrist Flexion Hold',ds:'1',dr:'8',instr:'At your side, arm straight, flex at the wrist and hold'},
-{id:61,cat:'Post-Throw Bands',name:'Wrist Extension Hold',ds:'1',dr:'8',instr:'At your side, arm straight, extend the wrist and hold'},
-{id:62,cat:'In-Game',name:'Forearm Stretch',ds:'3',dr:'5 sec',instr:'Gentle stretch, no aggressive pulling'},
-{id:63,cat:'In-Game',name:'Cross Body Stretch',ds:'3',dr:'5 sec',instr:'Relax shoulder, pull across body at the elbow'},
-{id:64,cat:'In-Game',name:'Swims',ds:'1',dr:'5',instr:'Smooth arm circles through full range'},
-{id:65,cat:'In-Game',name:'Field Goals',ds:'1',dr:'5',instr:'Elbows at 90 degrees, palms neutral, ER at the shoulder then press up'},
-{id:66,cat:'In-Game',name:'Hugs',ds:'1',dr:'5',instr:'Wrap arms around chest, open wide'},
-{id:67,cat:'In-Game',name:'Arm Circles (Small and Large)',ds:'1',dr:'5 ea way',instr:'Controlled speed, full motion - small and large'},
-{id:68,cat:'In-Game',name:'Bent Over Trunk Rotation',ds:'1',dr:'5 ea',instr:'Rotate chest side to side, stay hinged'}
-];
-
-// Shrinks a base64/data-URL image to a small JPEG before it goes into a printed PDF,
-// since the source library photos are full-resolution phone photos and bloat print output otherwise.
-function shrinkImgForPrint(src, maxW, maxH, quality) {
-  return new Promise(function(resolve) {
-    if (!src) { resolve(''); return; }
-    var img = new Image();
-    img.onload = function() {
-      var w = img.naturalWidth || maxW, h = img.naturalHeight || maxH;
-      var scale = Math.min(maxW / w, maxH / h, 1);
-      var cw = Math.max(1, Math.round(w * scale));
-      var ch = Math.max(1, Math.round(h * scale));
-      var canvas = document.createElement('canvas');
-      canvas.width = cw; canvas.height = ch;
-      var ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, cw, ch);
-      try { resolve(canvas.toDataURL('image/jpeg', quality || 0.55)); }
-      catch (e) { resolve(src); }
-    };
-    img.onerror = function() { resolve(src); };
-    img.src = src;
-  });
-}
-
-function getExPhoto(name) {
-  var cards = document.querySelectorAll('.ex-card');
-  for (var i=0;i<cards.length;i++){
-    var n=cards[i].querySelector('.ex-name');
-    if(n&&n.textContent.trim()===name){var img=cards[i].querySelector('.ex-photo img');if(img)return img.src;}
-  }
-  return '';
-}
-
-var pbProgram=[];
-var dragSrc=null;
-
-function unlockProgBuilder(){
-  var v=document.getElementById('progbuilder-code').value.trim().toUpperCase();
-  if(v===TB_CODE.toUpperCase()){
-    document.getElementById('progbuilder-gate').style.display='none';
-    document.getElementById('progbuilder-form').style.display='block';
-    document.getElementById('pb-date').value=new Date().toISOString().split('T')[0];
-    renderExLib();
-  } else { document.getElementById('progbuilder-err').textContent='Incorrect staff code.'; }
-}
-
-function filterExLib(){renderExLib();}
-
-function renderExLib(){
-  var cat=document.getElementById('pb-cat-filter').value;
-  var list=cat?EX_LIB.filter(function(e){return e.cat===cat;}):EX_LIB;
-  var el=document.getElementById('ex-lib-list');
-  if(!el)return;
-  el.innerHTML='';
-  list.forEach(function(ex){
-    var d=document.createElement('div');
-    d.className='ex-lib-item';
-    d.draggable=true;
-    d.dataset.exid=ex.id;
-    var photo=getExPhoto(ex.name);
-    d.innerHTML='<div class="ex-lib-thumb"><img src="'+photo+'" alt=""></div>'
-      +'<div style="flex:1;min-width:0"><div class="ex-lib-name">'+ex.name+'</div><div class="ex-lib-cat">'+ex.cat+'</div></div>'
-      +'<button class="ex-lib-add" onclick="addToProg('+ex.id+')">Add</button>';
-    d.addEventListener('dragstart',function(e){e.dataTransfer.setData('text/plain','lib:'+ex.id);});
-    el.appendChild(d);
-  });
-}
-
-function addToProg(exId){
-  var ex=EX_LIB.find(function(e){return e.id===exId;});
-  if(!ex)return;
-  var item={uid:Date.now()+Math.random(),exId:exId,name:ex.name,sets:ex.ds,reps:ex.dr,instr:ex.instr,photo:getExPhoto(ex.name),rest:''};
-  pbProgram.push(item);
-  renderProgram();
-}
-
-function removeFromProg(uid){pbProgram=pbProgram.filter(function(i){return i.uid!==uid;});renderProgram();}
-function clearProgram(){if(!pbProgram.length||confirm('Clear all exercises?')){pbProgram=[];renderProgram();}}
-
-function renderProgram(){
-  var el=document.getElementById('pb-program-list');
-  var msg=document.getElementById('pb-empty-msg');
-  var cnt=document.getElementById('pb-count');
-  if(!el)return;
-  if(cnt)cnt.textContent='('+pbProgram.length+' exercise'+(pbProgram.length!==1?'s':'')+')';
-  if(!pbProgram.length){el.innerHTML='';if(msg)msg.style.display='block';return;}
-  if(msg)msg.style.display='none';
-  el.innerHTML='';
-  pbProgram.forEach(function(item,idx){
-    var d=document.createElement('div');
-    d.className='pb-item';
-    d.dataset.uid=item.uid;
-    d.innerHTML='<div class="pb-item-hdr">'
-      +'<div class="pb-move-col">'
-      +'<button class="pb-move-btn" '+(idx===0?'disabled':'')+' onclick="moveProgItem('+item.uid+',-1)" aria-label="Move up">&#9650;</button>'
-      +'<button class="pb-move-btn" '+(idx===pbProgram.length-1?'disabled':'')+' onclick="moveProgItem('+item.uid+',1)" aria-label="Move down">&#9660;</button>'
-      +'</div>'
-      +'<div class="pb-thumb"><img src="'+item.photo+'" alt=""></div>'
-      +'<div class="pb-name">'+item.name+'</div>'
-      +'<button class="pb-remove" onclick="removeFromProg('+item.uid+')">&#215;</button>'
-      +'</div>'
-      +'<div class="pb-controls">'
-      +'<div><div class="pb-ctrl-lbl">Sets</div><input class="pb-ctrl-in" type="text" value="'+item.sets+'" data-uid="'+item.uid+'" data-field="sets" onchange="updateProgField(this)"></div>'
-      +'<div><div class="pb-ctrl-lbl">Reps / Duration</div><input class="pb-ctrl-in" type="text" value="'+item.reps+'" data-uid="'+item.uid+'" data-field="reps" onchange="updateProgField(this)"></div>'
-      +'<div><div class="pb-ctrl-lbl">Rest</div><input class="pb-ctrl-in" type="text" value="'+item.rest+'" placeholder="e.g. 60s" data-uid="'+item.uid+'" data-field="rest" onchange="updateProgField(this)"></div>'
-      +'</div>'
-      +'<div class="pb-instr">'+item.instr+'</div>';
-    el.appendChild(d);
-  });
-  el.ondragover=function(e){e.preventDefault();};
-  el.ondrop=function(e){
-    e.preventDefault();
-    var data=e.dataTransfer.getData('text/plain');
-    if(data&&data.startsWith('lib:'))addToProg(parseInt(data.split(':')[1]));
-  };
-}
-
-function moveProgItem(uid,dir){
-  var i=pbProgram.findIndex(function(it){return it.uid===uid;});
-  var j=i+dir;
-  if(i<0||j<0||j>=pbProgram.length)return;
-  var tmp=pbProgram[i];
-  pbProgram[i]=pbProgram[j];
-  pbProgram[j]=tmp;
-  renderProgram();
-}
-
-function updateProgField(el){
-  var uid=parseFloat(el.dataset.uid);
-  var field=el.dataset.field;
-  var item=pbProgram.find(function(i){return i.uid===uid;});
-  if(item)item[field]=el.value;
-}
-
-async function generateProgPDF(){
-  if(!pbProgram.length){alert('Add at least one exercise.');return;}
-  var btn = event && event.target;
-  if (btn) { btn.disabled = true; btn.textContent = 'Preparing PDF...'; }
-  var shrunkPhotos = await Promise.all(pbProgram.map(function(item){ return shrinkImgForPrint(item.photo, 260, 300, 0.55); }));
-  pbProgram.forEach(function(item, idx){ item._printPhoto = shrunkPhotos[idx]; });
-  if (btn) { btn.disabled = false; btn.textContent = 'Generate PDF Program'; }
-  var athlete=document.getElementById('pb-athlete').value||'Athlete';
-  var progname=document.getElementById('pb-progname').value||'Custom Program';
-  var provider=document.getElementById('pb-provider').value||'—';
-  var date=document.getElementById('pb-date').value||'';
-  var notes=document.getElementById('pb-notes').value||'';
-
-  var css='<style>';
-  css+='*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:12px;color:#1C1C1E;padding:20px}';
-  css+='.hdr{background:#0F1E35;color:#fff;padding:16px 20px;margin-bottom:16px;border-bottom:3px solid #C9A84C}';
-  css+='.hdr-ey{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;margin-bottom:4px}';
-  css+='.hdr-ti{font-size:20px;font-weight:700;margin-bottom:2px}';
-  css+='.hdr-me{font-size:11px;color:#7A9AB5}';
-  css+='.ibar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}';
-  css+='.ii{background:#F5F4F0;padding:8px;border-radius:3px}';
-  css+='.il{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A7A85;margin-bottom:2px}';
-  css+='.iv{font-size:12px;font-weight:700;color:#0F1E35}';
-  css+='.nb{background:#FDFBF4;border:1px solid #E8D8A0;border-left:3px solid #C9A84C;padding:10px 12px;margin-bottom:16px;font-size:12px;line-height:1.6}';
-  css+='.nl{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A6000;margin-bottom:4px}';
-  css+='.ec{display:grid;grid-template-columns:90px 1fr;border:1px solid #E8E4DC;border-radius:4px;overflow:hidden;margin-bottom:10px;height:100px;page-break-inside:avoid}';
-  css+='.ep{background:#1A2F4E;width:90px;height:100px;overflow:hidden}';
-  css+='.ep img{width:90px;height:100px;object-fit:cover;object-position:center 60%;display:block}';
-  css+='.eb{padding:10px 14px;overflow:hidden}';
-  css+='.en{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C9A84C;margin-bottom:3px}';
-  css+='.ex{font-size:14px;font-weight:700;color:#0F1E35;margin-bottom:5px}';
-  css+='.ed{display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap}';
-  css+='.edi{background:#0F1E35;color:#fff;padding:3px 8px;border-radius:2px;font-size:11px;font-weight:700}';
-  css+='.ei{font-size:11px;color:#4A4A52;line-height:1.6}';
-  css+='.ft{margin-top:20px;padding-top:10px;border-top:1px solid #E8E4DC;font-size:10px;color:#7A7A85;display:flex;justify-content:space-between}';
-  css+='@media print{body{padding:10px}.hdr,.ii,.edi{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
-  css+='</style>';
-
-  var b='<div class="hdr"><div class="hdr-ey">Advanced Athletic Medicine — Athlete Program</div>';
-  b+='<div class="hdr-ti">'+progname+'</div>';
-  b+='<div class="hdr-me">Confidential — For '+athlete+' Only</div></div>';
-  b+='<div class="ibar"><div class="ii"><div class="il">Athlete</div><div class="iv">'+athlete+'</div></div>';
-  b+='<div class="ii"><div class="il">Date</div><div class="iv">'+date+'</div></div>';
-  b+='<div class="ii"><div class="il">Provider</div><div class="iv">'+provider+'</div></div>';
-  b+='<div class="ii"><div class="il">Exercises</div><div class="iv">'+pbProgram.length+'</div></div></div>';
-  if(notes)b+='<div class="nb"><div class="nl">Program Instructions</div>'+notes+'</div>';
-  pbProgram.forEach(function(item,idx){
-    b+='<div class="ec"><div class="ep"><img src="'+(item._printPhoto||item.photo)+'" alt="'+item.name+'"></div>';
-    b+='<div class="eb"><div class="en">Exercise '+(idx+1)+'</div><div class="ex">'+item.name+'</div>';
-    b+='<div class="ed"><div class="edi">Sets: '+(item.sets||'—')+'</div><div class="edi">Reps: '+(item.reps||'—')+'</div><div class="edi">Rest: '+(item.rest||'—')+'</div></div>';
-    b+='<div class="ei">'+item.instr+'</div></div></div>';
-  });
-  b+='<div class="ft"><div>Provider: '+provider+' · Advanced Athletic Medicine</div>';
-  b+='<div>Clinical guidance. Follow as directed. · 2026</div></div>';
-
-  showPrintModal(css+b, progname);
-}
-
-function closePrintModal() {
-  var m = document.getElementById('print-modal');
-  if (m) { m.classList.remove('show'); document.getElementById('print-modal-body').innerHTML = ''; }
-}
-function showPrintModal(content, title) {
-  var m = document.getElementById('print-modal');
-  var b = document.getElementById('print-modal-body');
-  var t = document.getElementById('print-modal-title');
-  if (!m || !b) return;
-  if (t) t.textContent = title || 'Preview';
-  b.innerHTML = content;
-  m.classList.add('show');
-  m.scrollTop = 0;
-}
-
-
-
-function unlockArmScreen(){
-  var v=document.getElementById('armscreen-code').value.trim().toUpperCase();
-  if(v===TB_CODE.toUpperCase()){
-    document.getElementById('armscreen-gate').style.display='none';
-    document.getElementById('armscreen-form').style.display='block';
-    document.getElementById('as-date').value=new Date().toISOString().split('T')[0];
-    setupArcCalc();
-  } else { document.getElementById('armscreen-err').textContent='Incorrect staff code.'; }
-}
-function setupArcCalc(){
-  function calc(){
-    var et=parseFloat(document.getElementById('sh-er-t').value)||0;
-    var it=parseFloat(document.getElementById('sh-ir-t').value)||0;
-    var en=parseFloat(document.getElementById('sh-er-nt').value)||0;
-    var inn=parseFloat(document.getElementById('sh-ir-nt').value)||0;
-    if(et&&it)document.getElementById('sh-arc-t').value=et+it;
-    if(en&&inn){document.getElementById('sh-arc-nt').value=en+inn;if(et&&it)document.getElementById('sh-arc-diff').value=(en+inn)-(et+it);}
-  }
-  ['sh-er-t','sh-ir-t','sh-er-nt','sh-ir-nt'].forEach(function(id){var el=document.getElementById(id);if(el)el.oninput=calc;});
-}
-function getRadioVal(name){
-  var radios=document.querySelectorAll('input[name="'+name+'"]');
-  for(var i=0;i<radios.length;i++){if(radios[i].checked)return radios[i].value;}
-  return '—';
-}
-function getFlags(){
-  var flags=[];
-  var fm={'flag-gird':'GIRD > 20 degrees','flag-arc':'Total arc deficit > 5 degrees','flag-ext':'Elbow extension deficit > 5 degrees','flag-valgus':'Valgus stress test positive','flag-scap':'Scapular dyskinesis present','flag-post':'Forward head / kyphotic posture','flag-sx':'Current arm symptoms present','flag-ucl':'Prior UCL / shoulder surgery history'};
-  Object.keys(fm).forEach(function(id){var el=document.getElementById(id);if(el&&el.checked)flags.push(fm[id]);});
-  return flags;
-}
-function generateArmScreenPDF(){
-  var name=document.getElementById('as-name').value||'Athlete';
-  var date=document.getElementById('as-date').value||'';
-  var pos=document.getElementById('as-pos').value;
-  var dom=document.getElementById('as-dom').value;
-  var age=document.getElementById('as-age').value||'—';
-  var sx=document.getElementById('as-sx').value;
-  var yrs=document.getElementById('as-yrs').value||'—';
-  var vel=document.getElementById('as-vel').value||'—';
-  var inn=document.getElementById('as-inn').value||'—';
-  var shut=document.getElementById('as-shut').value;
-  var complaint=document.getElementById('as-complaint').value||'—';
-  var hx=document.getElementById('as-hx').value||'None reported';
-  var findings=document.getElementById('as-findings').value||'—';
-  var plan=document.getElementById('as-plan').value||'—';
-  var provider=document.getElementById('as-provider').value||'—';
-  var refer=document.getElementById('as-refer').value;
-  var flags=getFlags();
-  function rv(id){var el=document.getElementById(id);return el?(el.value||'—'):'—';}
-  function rs(id){var el=document.getElementById(id);return el?(el.value||'—'):'—';}
-
-  var css='<style>';
-  css+='*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#1C1C1E;padding:16px}';
-  css+='.hdr{background:#0F1E35;color:#fff;padding:14px 18px;margin-bottom:12px;border-bottom:3px solid #C9A84C}';
-  css+='.hdr-sub{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;margin-bottom:4px}';
-  css+='.hdr-title{font-size:17px;font-weight:700}';
-  css+='.hdr-meta{font-size:10px;color:#7A9AB5;margin-top:2px}';
-  css+='.ig{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px}';
-  css+='.ii{background:#F5F4F0;padding:6px 8px;border-radius:2px}';
-  css+='.il{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A7A85;margin-bottom:1px}';
-  css+='.iv{font-size:11px;font-weight:700;color:#0F1E35}';
-  css+='.nar{background:#F5F4F0;padding:7px 9px;border-radius:2px;font-size:11px;line-height:1.5;white-space:pre-wrap;min-height:28px;margin-bottom:8px}';
-  css+='.nar-lbl{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A7A85;margin-bottom:3px}';
-  css+='.sec{margin-bottom:10px}';
-  css+='.sec-title{background:#1A2F4E;color:#C9A84C;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 9px;margin-bottom:6px}';
-  css+='table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px}';
-  css+='th{background:#0F1E35;color:#fff;padding:4px 7px;text-align:left;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase}';
-  css+='td{padding:4px 7px;border-bottom:1px solid #E8E4DC;vertical-align:middle}';
-  css+='tr:nth-child(even) td{background:#FAFAF8}';
-  css+='.arc td{background:#FDFBF4;font-weight:700}';
-  css+='.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}';
-  css+='.flag-item{background:#FDF2F0;border-left:3px solid #C8402A;padding:4px 8px;margin-bottom:3px;font-size:10px}';
-  css+='.ok{color:#1A6A1A;font-size:10px;font-weight:700}';
-  css+='.ft{margin-top:12px;padding-top:8px;border-top:1px solid #E8E4DC;font-size:9px;color:#7A7A85;display:flex;justify-content:space-between}';
-  css+='@media print{.hdr,.ii,.sec-title,th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
-  css+='</style>';
-
-  var b='<div class="hdr"><div class="hdr-sub">Advanced Athletic Medicine</div><div class="hdr-title">Arm Care Screen</div><div class="hdr-meta">Confidential — For Clinical Use Only</div></div>';
-  b+='<div class="ig">';
-  b+='<div class="ii"><div class="il">Name</div><div class="iv">'+name+'</div></div>';
-  b+='<div class="ii"><div class="il">Date</div><div class="iv">'+date+'</div></div>';
-  b+='<div class="ii"><div class="il">Position</div><div class="iv">'+pos+'</div></div>';
-  b+='<div class="ii"><div class="il">Dom Arm</div><div class="iv">'+dom+'</div></div>';
-  b+='<div class="ii"><div class="il">Age</div><div class="iv">'+age+'</div></div>';
-  b+='<div class="ii"><div class="il">Symptoms</div><div class="iv">'+sx+'</div></div>';
-  b+='<div class="ii"><div class="il">Yrs Pitching</div><div class="iv">'+yrs+'</div></div>';
-  b+='<div class="ii"><div class="il">Velocity</div><div class="iv">'+vel+'</div></div>';
-  b+='<div class="ii"><div class="il">Inn/Wk</div><div class="iv">'+inn+'</div></div>';
-  b+='<div class="ii"><div class="il">Shutdown</div><div class="iv">'+shut+'</div></div>';
-  b+='</div>';
-  b+='<div class="nar-lbl">Chief Complaint</div><div class="nar">'+complaint+'</div>';
-  b+='<div class="nar-lbl">Prior Injury History</div><div class="nar">'+hx+'</div>';
-
-  b+='<div class="two">';
-  b+='<div>';
-  b+='<div class="sec"><div class="sec-title">Shoulder ROM and Strength</div>';
-  b+='<table><thead><tr><th>Motion</th><th>Throw</th><th>N-T</th><th>Str T</th><th>Str NT</th></tr></thead><tbody>';
-  b+='<tr><td><strong>ER</strong></td><td>'+rv('sh-er-t')+'</td><td>'+rv('sh-er-nt')+'</td><td>'+rs('sh-er-st')+'</td><td>'+rs('sh-er-snt')+'</td></tr>';
-  b+='<tr><td><strong>IR</strong></td><td>'+rv('sh-ir-t')+'</td><td>'+rv('sh-ir-nt')+'</td><td>'+rs('sh-ir-st')+'</td><td>'+rs('sh-ir-snt')+'</td></tr>';
-  b+='<tr class="arc"><td><strong>Total Arc</strong></td><td>'+rv('sh-arc-t')+'</td><td>'+rv('sh-arc-nt')+'</td><td>Diff:</td><td>'+rv('sh-arc-diff')+'</td></tr>';
-  b+='<tr><td><strong>Flexion</strong></td><td>'+rv('sh-fl-t')+'</td><td>'+rv('sh-fl-nt')+'</td><td>'+rs('sh-fl-st')+'</td><td>'+rs('sh-fl-snt')+'</td></tr>';
-  b+='<tr><td><strong>Abduction</strong></td><td>'+rv('sh-ab-t')+'</td><td>'+rv('sh-ab-nt')+'</td><td>'+rs('sh-ab-st')+'</td><td>'+rs('sh-ab-snt')+'</td></tr>';
-  b+='<tr><td><strong>H-ADD</strong></td><td>'+rv('sh-ha-t')+'</td><td>'+rv('sh-ha-nt')+'</td><td>'+rs('sh-ha-st')+'</td><td>'+rs('sh-ha-snt')+'</td></tr>';
-  b+='</tbody></table></div>';
-  b+='<div class="sec"><div class="sec-title">Elbow ROM</div>';
-  b+='<table><thead><tr><th>Motion</th><th>Throw</th><th>N-T</th><th>Str T</th><th>Str NT</th></tr></thead><tbody>';
-  b+='<tr><td><strong>Flexion</strong></td><td>'+rv('el-fl-t')+'</td><td>'+rv('el-fl-nt')+'</td><td>'+rs('el-fl-st')+'</td><td>'+rs('el-fl-snt')+'</td></tr>';
-  b+='<tr><td><strong>Extension</strong></td><td>'+rv('el-ex-t')+'</td><td>'+rv('el-ex-nt')+'</td><td>'+rs('el-ex-st')+'</td><td>'+rs('el-ex-snt')+'</td></tr>';
-  b+='</tbody></table></div>';
-  b+='<div class="sec"><div class="sec-title">Hip ROM</div>';
-  b+='<table><thead><tr><th>Motion</th><th>R</th><th>L</th><th>Str R</th><th>Str L</th></tr></thead><tbody>';
-  b+='<tr><td><strong>IR</strong></td><td>'+rv('hip-ir-r')+'</td><td>'+rv('hip-ir-l')+'</td><td>'+rs('hip-ir-sr')+'</td><td>'+rs('hip-ir-sl')+'</td></tr>';
-  b+='<tr><td><strong>ER</strong></td><td>'+rv('hip-er-r')+'</td><td>'+rv('hip-er-l')+'</td><td>'+rs('hip-er-sr')+'</td><td>'+rs('hip-er-sl')+'</td></tr>';
-  b+='<tr><td><strong>Extension</strong></td><td>'+rv('hip-ex-r')+'</td><td>'+rv('hip-ex-l')+'</td><td>'+rs('hip-ex-sr')+'</td><td>'+rs('hip-ex-sl')+'</td></tr>';
-  b+='</tbody></table></div>';
-  b+='</div>';
-  b+='<div>';
-  b+='<div class="sec"><div class="sec-title">Special Tests</div>';
-  b+='<table><thead><tr><th>Test</th><th>R</th><th>L</th><th>Finding</th></tr></thead><tbody>';
-  b+='<tr><td><strong>Valgus Stress</strong></td><td>'+rs('st-vr')+'</td><td>'+rs('st-vl')+'</td><td>'+rv('st-vf')+'</td></tr>';
-  b+='<tr><td><strong>OBriens</strong></td><td>'+rs('st-or')+'</td><td>'+rs('st-ol')+'</td><td>'+rv('st-of')+'</td></tr>';
-  b+='<tr><td><strong>Appley Scratch</strong></td><td>'+rs('st-ar')+'</td><td>'+rs('st-al')+'</td><td>'+rv('st-af')+'</td></tr>';
-  b+='<tr><td><strong>ULTT</strong></td><td>'+rs('st-ur')+'</td><td>'+rs('st-ul')+'</td><td>'+rv('st-uf')+'</td></tr>';
-  b+='</tbody></table></div>';
-  b+='<div class="sec"><div class="sec-title">Scapula and Posture</div>';
-  b+='<table><thead><tr><th>Finding</th><th>R</th><th>L</th><th>Notes</th></tr></thead><tbody>';
-  b+='<tr><td><strong>Inferior Position</strong></td><td>'+rs('sc-ip-r')+'</td><td>'+rs('sc-ip-l')+'</td><td>'+rv('sc-ip-n')+'</td></tr>';
-  b+='<tr><td><strong>Winging</strong></td><td>'+rs('sc-ld-r')+'</td><td>'+rs('sc-ld-l')+'</td><td>'+rv('sc-ld-n')+'</td></tr>';
-  b+='<tr><td><strong>Dyskinesis</strong></td><td>'+rs('sc-dk-r')+'</td><td>'+rs('sc-dk-l')+'</td><td>'+rv('sc-dk-n')+'</td></tr>';
-  b+='</tbody></table>';
-  b+='<table><thead><tr><th>Posture</th><th>Grade</th></tr></thead><tbody>';
-  b+='<tr><td>Scapular Winging</td><td>'+getRadioVal('post-sw')+'</td></tr>';
-  b+='<tr><td>Anterior Shoulders</td><td>'+getRadioVal('post-as')+'</td></tr>';
-  b+='<tr><td>Kyphotic Posture</td><td>'+getRadioVal('post-kp')+'</td></tr>';
-  b+='<tr><td>Forward Head</td><td>'+getRadioVal('post-fh')+'</td></tr>';
-  b+='</tbody></table></div>';
-  b+='<div class="sec"><div class="sec-title">Movement Screens</div>';
-  b+='<table><thead><tr><th>Screen</th><th>R</th><th>L</th><th>Notes</th></tr></thead><tbody>';
-  b+='<tr><td><strong>Quad T-Spine</strong></td><td>'+rv('ms-qr-r')+'</td><td>'+rv('ms-qr-l')+'</td><td>'+rv('ms-qr-n')+'</td></tr>';
-  b+='<tr><td><strong>Knee to Wall</strong></td><td>'+rv('ms-kw-r')+'</td><td>'+rv('ms-kw-l')+'</td><td>'+rv('ms-kw-n')+'</td></tr>';
-  b+='<tr><td><strong>Wall Mob Start</strong></td><td>'+rs('ms-ws-r')+'</td><td>'+rs('ms-ws-l')+'</td><td>'+rv('ms-ws-n')+'</td></tr>';
-  b+='<tr><td><strong>Wall Mob Maintain</strong></td><td>'+rs('ms-wm-r')+'</td><td>'+rs('ms-wm-l')+'</td><td>'+rv('ms-wm-n')+'</td></tr>';
-  b+='</tbody></table></div>';
-  b+='</div></div>';
-
-  var flagsHtml=flags.length?flags.map(function(f){return '<div class="flag-item">&#9888; '+f+'</div>';}).join(''):'<div class="ok">No flags identified</div>';
-  b+='<div class="sec"><div class="sec-title">Clinical Flags</div>'+flagsHtml+'</div>';
-  b+='<div class="two">';
-  b+='<div class="sec"><div class="sec-title">Findings / Impression</div><div class="nar">'+findings+'</div></div>';
-  b+='<div class="sec"><div class="sec-title">Plan / Recommendations</div><div class="nar">'+plan+'</div></div>';
-  b+='</div>';
-  b+='<div class="ft"><div>Provider: '+provider+' &nbsp;|&nbsp; Referral: '+refer+'</div><div>Advanced Athletic Medicine &middot; Confidential &middot; 2026</div></div>';
-
-  showPrintModal(css+b, 'Arm Care Screen - '+name);
-}
-
+// [protected clinical tool code loads from Supabase after staff access is confirmed]
 // ============================================================
 // COACHES TOOLS - THROW EXPOSURE BOARD
 // ============================================================
@@ -4471,6 +2971,279 @@ function ctRenderBoard(){
 }
 
 // ============================================================
+// ACCESS LAYER
+// Programs, Coaches Tools and Clinical tools are NOT in this file.
+// They are stored in Supabase and handed out by aam_get_content()
+// only to approved accounts or valid codes (checked on the server).
+// ============================================================
+var aamAccess = null;
+var aamInjected = {};
+var aamLoadInFlight = null;
+
+function aamSessGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+function aamSessSet(k, v) { try { sessionStorage.setItem(k, v); } catch (e) {} }
+function aamSessDel(k) { try { sessionStorage.removeItem(k); } catch (e) {} }
+function aamEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function aamSetShellsLoading(on) {
+  document.querySelectorAll('[data-aam-shell]').forEach(function(el) { el.classList.toggle('aam-loading', !!on); });
+}
+
+async function aamLoadProtected(opts) {
+  opts = opts || {};
+  // Collapse duplicate background refreshes into one request
+  if (!opts.tier2Code && !opts.staffCode && aamLoadInFlight) return aamLoadInFlight;
+  var run = (async function() {
+    var ok = await ensureSupabaseLoaded();
+    var sb = ok ? getSb() : null;
+    if (!sb) return null;
+    var t2 = opts.tier2Code || aamSessGet('aamTier2Code');
+    var sc = opts.staffCode || aamSessGet('aamStaffCode');
+    aamSetShellsLoading(true);
+    var res;
+    try {
+      res = await sb.rpc('aam_get_content', { p_tier2_code: t2 || null, p_staff_code: sc || null });
+    } catch (e) {
+      res = { error: e };
+    }
+    aamSetShellsLoading(false);
+    if (res.error) { console.warn('[AAM] access check failed', res.error); return null; }
+    var acc = res.data || {};
+    if (!acc.locked) {
+      if (t2) { if (acc.tier2_code_ok) aamSessSet('aamTier2Code', t2); else aamSessDel('aamTier2Code'); }
+      if (sc) { if (acc.staff_code_ok && acc.clinical) aamSessSet('aamStaffCode', sc); else if (!opts.staffCode) aamSessDel('aamStaffCode'); }
+    }
+    aamInject(acc.sections || []);
+    aamAccess = acc;
+    aamApplyAccess(acc);
+    return acc;
+  })();
+  if (!opts.tier2Code && !opts.staffCode) {
+    aamLoadInFlight = run;
+    run.then(function() { aamLoadInFlight = null; }, function() { aamLoadInFlight = null; });
+  }
+  return run;
+}
+
+function aamInject(sections) {
+  var clinicalAdded = false;
+  sections.forEach(function(s) {
+    if (s.kind !== 'html' || aamInjected[s.id]) return;
+    var el = document.getElementById('sec-' + s.id);
+    if (!el) return;
+    el.innerHTML = s.body;
+    aamInjected[s.id] = true;
+    if (s.tier === 'clinical') clinicalAdded = true;
+  });
+  sections.forEach(function(s) {
+    if (s.kind !== 'js' || aamInjected[s.id]) return;
+    var sc = document.createElement('script');
+    sc.text = s.body;
+    document.body.appendChild(sc);
+    aamInjected[s.id] = true;
+    if (s.tier === 'clinical') clinicalAdded = true;
+  });
+  if (clinicalAdded) aamAfterClinicalLoaded();
+}
+
+function aamAfterClinicalLoaded() {
+  var today = new Date().toISOString().split('T')[0];
+  try { clinUnlockAll(); } catch (e) { console.warn(e); }
+  try { tbInitGate(); tbInitDayCheckboxes(); } catch (e) { console.warn(e); }
+  var pbGate = document.getElementById('progbuilder-gate');
+  var pbForm = document.getElementById('progbuilder-form');
+  if (pbGate && pbForm) {
+    pbGate.style.display = 'none'; pbForm.style.display = 'block';
+    var pbd = document.getElementById('pb-date'); if (pbd && !pbd.value) pbd.value = today;
+    try { if (typeof renderExLib === 'function') renderExLib(); } catch (e) { console.warn(e); }
+  }
+  var asGate = document.getElementById('armscreen-gate');
+  var asForm = document.getElementById('armscreen-form');
+  if (asGate && asForm) {
+    asGate.style.display = 'none'; asForm.style.display = 'block';
+    var asd = document.getElementById('as-date'); if (asd && !asd.value) asd.value = today;
+    try { if (typeof setupArcCalc === 'function') setupArcCalc(); } catch (e) { console.warn(e); }
+  }
+}
+
+function aamApplyAccess(acc) {
+  var showTier2 = !!acc.tier2;
+  document.querySelectorAll('[data-tier-gate]').forEach(function(el) { el.style.display = showTier2 ? '' : 'none'; });
+  var showClinical = !!(acc.clinical || (acc.signed_in && acc.active));
+  document.querySelectorAll('[data-clinical-gate]').forEach(function(el) { el.style.display = showClinical ? '' : 'none'; });
+  if (acc.clinical) { try { clinUnlockAll(); } catch (e) {} }
+}
+
+async function aamUnlockClinical(code, errEl) {
+  code = (code || '').trim().toUpperCase();
+  function say(t) { if (errEl) errEl.textContent = t; }
+  say('');
+  if (!code) { say('Enter the staff code.'); return false; }
+  say('Checking...');
+  var acc = await aamLoadProtected({ staffCode: code });
+  if (!acc) { say('Could not connect. Check your internet connection and try again.'); return false; }
+  if (acc.locked) { say('Too many attempts. Try again in 15 minutes.'); return false; }
+  if (!acc.signed_in) { say('Log in to your AAM account first.'); return false; }
+  if (!acc.staff_code_ok) { say('Incorrect code.'); return false; }
+  if (!acc.clinical) { say('Your account must be approved by AAM before clinical tools unlock.'); return false; }
+  say('');
+  return true;
+}
+
+async function aamTier2FromShell(id) {
+  var inp = document.getElementById('aam-in-' + id);
+  var err = document.getElementById('aam-err-' + id);
+  var v = inp ? inp.value.trim().toUpperCase() : '';
+  if (!v) { err.textContent = 'Enter your access code.'; return; }
+  err.textContent = 'Checking...';
+  var acc = await aamLoadProtected({ tier2Code: v });
+  if (!acc) { err.textContent = 'Could not connect. Check your internet connection and try again.'; return; }
+  if (acc.locked) { err.textContent = 'Too many attempts. Try again in 15 minutes.'; return; }
+  if (!acc.tier2_code_ok) { err.textContent = 'Incorrect code.'; return; }
+  if (!aamSessGet('aamGuestMode') && !acc.signed_in) aamSessSet('aamGuestMode', 'tier2');
+}
+
+async function aamStaffFromShell(id) {
+  var inp = document.getElementById('aam-in-' + id);
+  var v = inp ? inp.value : '';
+  if (inp) inp.value = '';
+  await aamUnlockClinical(v, document.getElementById('aam-err-' + id));
+}
+
+// ---------- Email sign-in code (no password) ----------
+function gateShowCodeLogin() {
+  ['gate-login-form', 'gate-signup-form', 'gate-reset-form'].forEach(function(id) { document.getElementById(id).style.display = 'none'; });
+  document.getElementById('gate-code-form').style.display = 'block';
+  document.getElementById('gate-code-step2').style.display = 'none';
+  var le = document.getElementById('gate-login-email').value.trim();
+  if (le) document.getElementById('gate-code-email').value = le;
+  var err = document.getElementById('gateErr'); err.textContent = ''; err.style.color = '';
+}
+
+async function gateSendLoginCode() {
+  var email = document.getElementById('gate-code-email').value.trim();
+  var err = document.getElementById('gateErr');
+  err.style.color = ''; err.textContent = '';
+  if (!email) { err.textContent = 'Enter your email address.'; return; }
+  acctSetRememberPref(document.getElementById('gate-login-remember').checked);
+  var btn = document.getElementById('gate-code-send-btn');
+  btn.disabled = true; btn.textContent = 'Sending...';
+  var ok = await ensureSupabaseLoaded();
+  var sb = ok ? getSb() : null;
+  btn.disabled = false; btn.textContent = 'Resend Code';
+  if (!sb) { err.textContent = 'Could not connect. Check your internet connection and try again.'; return; }
+  var res = await sb.auth.signInWithOtp({ email: email, options: { shouldCreateUser: false } });
+  if (res.error) {
+    err.textContent = /signups not allowed|not found/i.test(res.error.message)
+      ? 'No AAM account uses that email. Sign up first, or check the spelling.'
+      : res.error.message;
+    return;
+  }
+  document.getElementById('gate-code-step2').style.display = 'block';
+  err.style.color = '#7ADB9E';
+  err.textContent = 'Code sent. Check your email (and spam folder).';
+  setTimeout(function() { var t = document.getElementById('gate-code-token'); if (t) t.focus(); }, 50);
+}
+
+async function gateVerifyLoginCode() {
+  var email = document.getElementById('gate-code-email').value.trim();
+  var token = document.getElementById('gate-code-token').value.replace(/\s/g, '');
+  var err = document.getElementById('gateErr');
+  err.style.color = ''; err.textContent = '';
+  if (!token) { err.textContent = 'Enter the code from your email.'; return; }
+  var btn = document.getElementById('gate-code-verify-btn');
+  btn.disabled = true; btn.textContent = 'Checking...';
+  var sb = getSb();
+  var res = sb ? await sb.auth.verifyOtp({ email: email, token: token, type: 'email' }) : { error: { message: 'Could not connect.' } };
+  btn.disabled = false; btn.textContent = 'Log In';
+  if (res.error) { err.textContent = /expired|invalid/i.test(res.error.message) ? 'That code is incorrect or expired. Request a new one.' : res.error.message; return; }
+  document.getElementById('gate-code-token').value = '';
+  gateUnlockApp();
+}
+
+// ---------- Admin: member approvals ----------
+var aamMembers = [];
+var aamMemCurrentFilter = 'pending';
+
+async function aamAdminLoadMembers() {
+  var sb = getSb();
+  if (!sb) return;
+  var list = document.getElementById('aam-mem-list');
+  if (list) list.innerHTML = '<div style="color:#7A7A85;font-size:13px">Loading members...</div>';
+  var res = await sb.rpc('aam_admin_list_members');
+  if (res.error) {
+    if (list) list.innerHTML = '<div style="color:#C0392B;font-size:13px">Could not load members: ' + aamEsc(res.error.message) + '</div>';
+    return;
+  }
+  aamMembers = res.data || [];
+  var pend = aamMembers.filter(function(m) { return m.access_status === 'pending'; }).length;
+  if (aamMemCurrentFilter === 'pending' && pend === 0 && aamMembers.length) aamMemCurrentFilter = 'active';
+  aamMemFilter(aamMemCurrentFilter);
+}
+
+function aamMemFilter(f) {
+  aamMemCurrentFilter = f;
+  document.querySelectorAll('.aam-mem-filter').forEach(function(b) {
+    var key = b.getAttribute('data-f');
+    var n = key === 'all' ? aamMembers.length : aamMembers.filter(function(m) { return m.access_status === key; }).length;
+    b.textContent = key.charAt(0).toUpperCase() + key.slice(1) + ' (' + n + ')';
+    b.classList.toggle('active', key === f);
+  });
+  var rows = aamMembers.filter(function(m) { return f === 'all' || m.access_status === f; });
+  var list = document.getElementById('aam-mem-list');
+  if (!list) return;
+  if (!rows.length) { list.innerHTML = '<div style="color:#7A7A85;font-size:13px">No ' + (f === 'all' ? '' : f + ' ') + 'members.</div>'; return; }
+  list.innerHTML = rows.map(function(m) {
+    var st = m.access_status;
+    var joined = m.signed_up ? new Date(m.signed_up).toLocaleDateString() : '';
+    var last = m.last_sign_in ? new Date(m.last_sign_in).toLocaleDateString() : 'never';
+    var roles = ['athlete', 'parent', 'coach', 'admin'].map(function(r) {
+      return '<option value="' + r + '"' + (m.role === r ? ' selected' : '') + '>' + r.charAt(0).toUpperCase() + r.slice(1) + '</option>';
+    }).join('');
+    var btns = '';
+    if (st !== 'active') btns += '<button class="aam-mem-btn ok" onclick="aamMemSet(\'' + m.id + '\',\'active\')">' + (st === 'paused' ? 'Reactivate' : 'Approve') + '</button>';
+    if (st === 'active' && m.role !== 'admin') btns += '<button class="aam-mem-btn warn" onclick="aamMemSet(\'' + m.id + '\',\'paused\')">Pause</button>';
+    return '<div class="aam-mem-row ' + aamEsc(st) + '">' +
+      '<div><div class="aam-mem-name">' + aamEsc(m.full_name || '(no name)') + '</div>' +
+      '<div class="aam-mem-meta">' + aamEsc(m.email) + ' &middot; joined ' + aamEsc(joined) + ' &middot; last login ' + aamEsc(last) +
+      (m.invite_code_used ? ' &middot; code ' + aamEsc(m.invite_code_used) : '') + '</div></div>' +
+      '<div class="aam-mem-actions"><select onchange="aamMemRole(\'' + m.id + '\', this.value)">' + roles + '</select>' + btns + '</div></div>';
+  }).join('');
+}
+
+function aamMemMsg(text, isErr) {
+  var el = document.getElementById('aam-mem-msg');
+  if (!el) return;
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.color = isErr ? '#C0392B' : '#2E8B57';
+  clearTimeout(aamMemMsg._t);
+  aamMemMsg._t = setTimeout(function() { el.style.display = 'none'; }, 3500);
+}
+
+async function aamMemSet(id, status) {
+  var sb = getSb();
+  var res = await sb.rpc('aam_admin_update_member', { p_user: id, p_status: status, p_role: null });
+  if (res.error) { aamMemMsg(res.error.message, true); return; }
+  aamMemMsg(status === 'active' ? 'Member approved.' : 'Membership paused.');
+  aamAdminLoadMembers();
+  acctLoadAdminOverview();
+}
+
+async function aamMemRole(id, role) {
+  var sb = getSb();
+  var res = await sb.rpc('aam_admin_update_member', { p_user: id, p_status: null, p_role: role });
+  if (res.error) { aamMemMsg(res.error.message, true); aamAdminLoadMembers(); return; }
+  aamMemMsg('Role updated to ' + role + '.');
+  aamAdminLoadMembers();
+  acctLoadAdminOverview();
+}
+
+// ============================================================
 // ACCOUNT SYSTEM (Supabase Auth - Coach / Parent / Athlete)
 // ============================================================
 var SUPABASE_URL = 'https://ygwsqsthzypikuzughwy.supabase.co';
@@ -4535,7 +3308,9 @@ async function acctSignUp() {
   var email = document.getElementById('acct-signup-email').value.trim();
   var password = document.getElementById('acct-signup-password').value;
   var role = document.getElementById('acct-signup-role').value;
+  var invite = document.getElementById('acct-signup-invite').value.trim().toUpperCase();
   if (!name || !email || !password) { acctShowMsg('Fill in your name, email, and password.', 'error'); return; }
+  if (!invite) { acctShowMsg('Enter your invite code.', 'error'); return; }
   if (password.length < 6) { acctShowMsg('Password must be at least 6 characters.', 'error'); return; }
 
   var btn = document.getElementById('acct-signup-btn');
@@ -4545,10 +3320,13 @@ async function acctSignUp() {
   btn.disabled = false; btn.textContent = 'Create Account';
   if (!sb) { acctShowMsg('Could not connect to the account system. Check your internet connection and try again.', 'error'); return; }
 
+  var codeRes = await sb.rpc('aam_check_invite', { p_code: invite });
+  if (codeRes.error || codeRes.data !== true) { acctShowMsg('Invalid invite code. Check with your coach or AAM staff for the current code.', 'error'); return; }
+
   var res = await sb.auth.signUp({
     email: email,
     password: password,
-    options: { data: { full_name: name, role: role } }
+    options: { data: { full_name: name, role: role, invite_code: invite } }
   });
   if (res.error) { acctShowMsg(res.error.message, 'error'); return; }
   acctShowMsg('Account created! Check your email to confirm, then log in.', 'success');
@@ -4597,55 +3375,64 @@ function clinRelockAll() {
 
 async function acctLogOut() {
   var sb = getSb();
-  if (sb) await sb.auth.signOut();
-  clinRelockAll();
-  document.getElementById('acct-loggedin').style.display = 'none';
-  document.getElementById('acct-loggedout').style.display = 'block';
-  document.getElementById('acct-login-email').value = '';
-  document.getElementById('acct-login-password').value = '';
-  document.getElementById('acct-msg').style.display = 'none';
-  var navItem = document.getElementById('nav-account-item');
-  if (navItem) navItem.textContent = 'Log In / Sign Up';
-
-  // Login is the sole way into the app now - send them back to the gate
-  document.getElementById('app').style.display = 'none';
-  document.getElementById('gate').style.display = 'flex';
-  document.getElementById('gate-login-email').value = '';
-  document.getElementById('gate-login-password').value = '';
-  gateSwitchTab('login');
+  if (sb) { try { await sb.auth.signOut(); } catch (e) {} }
+  ['aamStaffCode', 'aamTier2Code', 'aamGuestMode'].forEach(function(k) { try { sessionStorage.removeItem(k); } catch (e) {} });
+  // Reload so protected sections are cleared from the page entirely
+  window.location.reload();
 }
 
 function acctRenderLoggedIn(user) {
   sessionStorage.removeItem('aamGuestMode');
-  applyGuestRestrictions(false);
+  applyGuestRestrictions('tier1');
   var name = (user.user_metadata && user.user_metadata.full_name) || user.email;
-  var role = (user.user_metadata && user.user_metadata.role) || 'unknown';
   document.getElementById('acct-name-display').textContent = name;
   document.getElementById('acct-email-display').textContent = user.email;
-  document.getElementById('acct-role-display').textContent = role;
+  document.getElementById('acct-role-display').textContent = 'checking access...';
   document.getElementById('acct-loggedout').style.display = 'none';
   document.getElementById('acct-loggedin').style.display = 'block';
+  ['acct-admin-panel', 'acct-coach-panel', 'acct-joincode-panel'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.style.display = 'none';
+  });
+  var navItem = document.getElementById('nav-account-item');
+  if (navItem) navItem.textContent = name;
+  aamLoadProtected().then(function(acc) { aamRenderAccountPanels(user, acc); });
+}
+
+function aamRenderAccountPanels(user, acc) {
+  var name = (user.user_metadata && user.user_metadata.full_name) || user.email;
+  var banner = document.getElementById('acct-status-banner');
+  if (!acc) {
+    document.getElementById('acct-role-display').textContent = 'offline';
+    return;
+  }
+  var role = acc.role || 'athlete';
+  var status = acc.is_admin ? 'active' : (acc.status || 'pending');
+  document.getElementById('acct-role-display').textContent = role + (status === 'active' ? '' : ' \u00b7 ' + status);
   var navItem = document.getElementById('nav-account-item');
   if (navItem) navItem.textContent = name + ' (' + role + ')';
 
-  document.getElementById('acct-admin-panel').style.display = role === 'admin' ? 'block' : 'none';
-  document.getElementById('acct-coach-panel').style.display = (role === 'coach' || role === 'admin') ? 'block' : 'none';
-  document.getElementById('acct-joincode-panel').style.display = (role === 'athlete' || role === 'parent') ? 'block' : 'none';
-
-  if (role !== 'coach' && role !== 'admin') clinRelockAll();
-  if (role === 'admin') {
-    clinUnlockAll();
-    var pbGate = document.getElementById('progbuilder-gate');
-    var pbForm = document.getElementById('progbuilder-form');
-    if (pbGate && pbForm) { pbGate.style.display = 'none'; pbForm.style.display = 'block'; document.getElementById('pb-date').value = new Date().toISOString().split('T')[0]; renderExLib(); }
-    var asGate = document.getElementById('armscreen-gate');
-    var asForm = document.getElementById('armscreen-form');
-    if (asGate && asForm) { asGate.style.display = 'none'; asForm.style.display = 'block'; document.getElementById('as-date').value = new Date().toISOString().split('T')[0]; setupArcCalc(); }
+  if (banner) {
+    if (status === 'pending') {
+      banner.className = 'pending';
+      banner.innerHTML = '<strong>Membership pending.</strong> Your account is set up. AAM will activate your membership once your plan is confirmed. Until then you have the free version of the app. Questions? <a onclick="showSection(\'contact\')" style="color:#1B2A4A;text-decoration:underline;cursor:pointer">Contact AAM</a>.';
+      banner.style.display = 'block';
+    } else if (status === 'paused') {
+      banner.className = 'paused';
+      banner.innerHTML = '<strong>Membership paused.</strong> Your account is on hold, so you have the free version of the app. <a onclick="showSection(\'contact\')" style="color:#1B2A4A;text-decoration:underline;cursor:pointer">Contact AAM</a> to reactivate.';
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
   }
 
-  if (role === 'admin') acctLoadAdminOverview();
-  if (role === 'coach' || role === 'admin') acctLoadTeamList();
-  else if (role === 'athlete' || role === 'parent') acctLoadLinkedAthletes();
+  var active = !!acc.active;
+  document.getElementById('acct-admin-panel').style.display = acc.is_admin ? 'block' : 'none';
+  document.getElementById('acct-coach-panel').style.display = (active && (role === 'coach' || acc.is_admin)) ? 'block' : 'none';
+  document.getElementById('acct-joincode-panel').style.display = (active && (role === 'athlete' || role === 'parent')) ? 'block' : 'none';
+
+  if (acc.is_admin) { acctLoadAdminOverview(); aamAdminLoadMembers(); }
+  if (active && (role === 'coach' || acc.is_admin)) acctLoadTeamList();
+  else if (active && (role === 'athlete' || role === 'parent')) acctLoadLinkedAthletes();
 }
 
 async function acctCreateTeam() {
