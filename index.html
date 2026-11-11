@@ -460,6 +460,19 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 .aam-book-cta p { color:#C8D1E3; font-size:13px; line-height:1.5; margin:0 0 12px; }
 .aam-book-cta .aam-cred { color:#7A9AB5; font-size:11px; margin:10px 0 0; }
 #pm-client { background:#1B2D4F; border:1px solid #2A4A6A; color:#fff; border-radius:4px; padding:6px 8px; font-size:12px; width:180px; }
+#aam-intake-modal { position:fixed; inset:0; background:#F7F6F2; z-index:9000; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.aam-ik-bar { position:sticky; top:0; background:#0F1E35; color:#C9A84C; font-weight:700; font-size:13px; letter-spacing:.5px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; z-index:2; border-bottom:3px solid #C9A84C; }
+.aam-ik-bar button { background:none; border:none; color:#fff; font-size:26px; line-height:1; cursor:pointer; padding:0 4px; }
+.aam-ik-body { max-width:760px; margin:0 auto; padding:18px 18px 60px; }
+.aam-ik-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:0 14px; }
+.aam-ik-checks { display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:6px 14px; font-size:13px; }
+.aam-ik-checks label { display:flex; gap:8px; align-items:flex-start; line-height:1.35; }
+.aam-ik-checks input, .aam-ik-agree input { width:18px; height:18px; flex:0 0 18px; accent-color:#C9A84C; margin-top:1px; }
+.aam-ik-consent { background:#fff; border:1px solid #E8E4DC; border-radius:6px; padding:14px 16px; max-height:320px; overflow-y:auto; font-size:13px; line-height:1.55; color:#2A2A30; margin-bottom:12px; }
+.aam-ik-consent p { margin:0 0 9px; }
+.aam-ik-consent-title { font-weight:700; color:#0F1E35; margin-bottom:8px; }
+.aam-ik-agree { display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:1.5; margin:0 0 12px; color:#2A2A30; }
+.aam-sig-pad { width:100%; max-width:600px; height:auto; aspect-ratio:600/180; background:#fff; border:1px dashed #9AA3B5; border-radius:6px; touch-action:none; display:block; }
 #print-modal { display:none; position:fixed; inset:0; background:#fff; z-index:900; overflow-y:auto; }
 #print-modal.show { display:block; }
 .print-modal-bar { background:#0F1E35; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; gap:12px; }
@@ -469,7 +482,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 .pm-close-btn { background:none; border:1px solid rgba(255,255,255,0.4); color:#fff; font-family:Arial,sans-serif; font-weight:700; font-size:12px; padding:8px 16px; border-radius:3px; cursor:pointer; }
 @media (max-width:600px){ .print-modal-bar{flex-wrap:wrap} .print-modal-title{flex:1 1 100%} .print-modal-btns{flex:1 1 100%} #pm-client{flex:1;width:auto;min-width:0} }
 #print-modal-body { padding:20px; max-width:800px; margin:0 auto; }
-@media print { html, body { background:#fff !important; } .print-modal-bar { display:none !important; } #print-modal { position:absolute; top:0; left:0; } body > *:not(#print-modal) { display:none !important; } }
+@media print { html, body { background:#fff !important; } .print-modal-bar { display:none !important; } #print-modal { position:static !important; inset:auto !important; overflow:visible !important; height:auto !important; } html, body { height:auto !important; overflow:visible !important; } body > *:not(#print-modal) { display:none !important; } }
 
 .ex-lib-item{background:#fff;border:1px solid #E8E4DC;border-radius:4px;display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:grab}
 .ex-lib-item:hover{border-color:#C9A84C}
@@ -1651,6 +1664,20 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
     <div id="acct-status-banner" style="display:none"></div>
 
         <div id="acct-admin-panel" style="display:none">
+      <div class="h2">Intake Forms Waiting for Review<span id="aam-intake-count"></span></div>
+      <div class="tb-privacy-note" style="margin-bottom:10px">Open the PDF, save it to the client&rsquo;s OneDrive folder, then mark it filed. Filing permanently deletes the health answers from the app; only the date the intake and consent were completed is kept.</div>
+      <div id="aam-intake-list"></div>
+      <div class="h2">AAM Clients</div>
+      <div class="tool-form" style="padding:16px">
+        <div class="aam-ik-grid">
+          <div class="form-row"><label class="form-label" for="aam-client-name">Client name</label><input class="form-input" type="text" id="aam-client-name" placeholder="First Last"></div>
+          <div class="form-row"><label class="form-label" for="aam-client-dob">Date of birth (optional)</label><input class="form-input" type="date" id="aam-client-dob"></div>
+        </div>
+        <button class="btn-primary" onclick="aamAdminAddClient()">Add client</button>
+        <div class="save-msg" id="aam-client-msg" style="display:none"></div>
+        <div class="tb-privacy-note">After adding a client, send the <strong>Parent invite</strong> (under 18) or <strong>Athlete invite</strong>. The link creates their account, links it to this client, and opens the intake forms. No invite code or approval needed.</div>
+      </div>
+      <div id="aam-client-list"></div>
       <div class="h2">Platform Overview</div>
       <div class="acct-stats-row" id="acct-admin-stats"></div>
       <div class="h2" style="margin-top:20px">Members</div>
@@ -1715,10 +1742,11 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
     <div id="acct-joincode-panel" style="display:none">
       <div class="h2">Join Your Team</div>
       <div class="tool-form">
-        <div class="form-row"><label class="form-label">Join Code</label><input type="text" class="form-input" id="acct-joincode-input" placeholder="6-character code from your coach"></div>
+        <div class="form-row"><label class="form-label">Join Code</label><input type="text" class="form-input" id="acct-joincode-input" placeholder="Code from your coach or AAM"></div>
         <button class="btn-primary" onclick="acctClaimCode()">Link My Account</button>
         <div class="save-msg" id="acct-joincode-msg" style="display:none"></div>
       </div>
+      <div id="aam-intake-cards" style="margin-top:16px"></div>
       <div id="acct-linked-list" style="margin-top:16px"></div>
       <div id="acct-weekly-plan-view" style="margin-top:24px"></div>
     </div>
@@ -1963,7 +1991,8 @@ async function gateSignUp() {
 
   if (!name || !email || !password) { err.textContent = 'Fill in your name, email, and password.'; return; }
   if (password.length < 6) { err.textContent = 'Password must be at least 6 characters.'; return; }
-  if (!invite) { err.textContent = 'Enter your invite code.'; return; }
+  if (!invite && !aamJoin) { err.textContent = 'Enter your invite code.'; return; }
+  if (aamJoin) role = aamJoin.as;
 
   var remember = document.getElementById('gate-signup-remember').checked;
   acctSetRememberPref(remember);
@@ -1974,15 +2003,19 @@ async function gateSignUp() {
   var sb = ok ? getSb() : null;
   if (!sb) { btn.disabled = false; btn.textContent = 'Create Account'; err.textContent = 'Could not connect. Check your internet connection and try again.'; return; }
 
-  var codeRes = await sb.rpc('aam_check_invite', { p_code: invite });
-  if (codeRes.error || codeRes.data !== true) {
-    btn.disabled = false; btn.textContent = 'Create Account';
-    err.textContent = 'Invalid invite code. Check with your coach or AAM staff for the current code.';
-    return;
+  if (!aamJoin) {
+    var codeRes = await sb.rpc('aam_check_invite', { p_code: invite });
+    if (codeRes.error || codeRes.data !== true) {
+      btn.disabled = false; btn.textContent = 'Create Account';
+      err.textContent = 'Invalid invite code. Check with your coach or AAM staff for the current code.';
+      return;
+    }
   }
 
   btn.textContent = 'Creating account...';
-  var res = await sb.auth.signUp({ email: email, password: password, options: { data: { full_name: name, role: role, invite_code: invite } } });
+  var meta = aamJoin ? { full_name: name, role: aamJoin.as, join_code: aamJoin.code, join_as: aamJoin.as } : { full_name: name, role: role, invite_code: invite };
+  var res = await sb.auth.signUp({ email: email, password: password, options: { data: meta } });
+  if (res.error && aamJoin && /database error/i.test(res.error.message)) { btn.disabled = false; btn.textContent = 'Create Account'; err.textContent = 'This invite link is no longer valid. Ask Advanced Athletic Medicine for a new one.'; return; }
   btn.disabled = false; btn.textContent = 'Create Account';
   if (res.error) { err.textContent = res.error.message; return; }
 
@@ -1990,9 +2023,11 @@ async function gateSignUp() {
     gateUnlockApp();
 
   } else {
-    err.style.color = '#7ADB9E';
-    err.textContent = 'Account created! Check your email to confirm, then log in. AAM will approve your membership.';
+    var wasJoin = !!aamJoin;
+    if (aamJoin) { aamJoin = null; try { sessionStorage.removeItem('aamJoin'); } catch (e) {} }
     gateSwitchTab('login');
+    err.style.color = '#7ADB9E';
+    err.textContent = wasJoin ? 'Account created! Check your email to confirm, then log in to finish your forms.' : 'Account created! Check your email to confirm, then log in. AAM will approve your membership.';
   }
 }
 
@@ -2018,6 +2053,7 @@ function aamPdfFileName() {
   if (/^Arm Care Screen/i.test(title)) { docType = 'ArmScreen'; date = aamValOf('as-date'); }
   else if (/^Throwing Program\s*-/i.test(title)) { docType = 'ThrowingProgram'; date = aamValOf('tb-startdate'); }
   else if (/^Run-Jump Progression\s*-/i.test(title)) { docType = 'RunJump'; date = aamValOf('rj-startdate'); }
+  else if (/^Intake Form\s*-/i.test(title)) { docType = 'Intake'; date = window.aamPrintDate || ''; }
   else if (document.getElementById('pb-progname') && title.trim() === aamValOf('pb-progname').trim()) { docType = 'Program_' + aamFileSafe(title); date = aamValOf('pb-date'); }
   else if (title) { docType = aamFileSafe(title); }
   var who = aamNameForFile(client);
@@ -2041,11 +2077,371 @@ function aamPrintPdf() {
   new MutationObserver(function() {
     var box = document.getElementById('pm-client');
     if (!box) return;
-    var m = /^(Arm Care Screen|Throwing Program|Run-Jump Progression)\s*-\s*(.+)$/i.exec(t.textContent || '');
+    var m = /^(Arm Care Screen|Throwing Program|Run-Jump Progression|Intake Form)\s*-\s*(.+)$/i.exec(t.textContent || '');
     var nm = m ? m[2].trim() : '';
     box.value = (nm && nm !== 'Patient Name Not Entered' && nm !== 'Athlete') ? nm : '';
   }).observe(t, { childList: true, characterData: true, subtree: true });
 })();
+
+
+// ============================================================
+// CLIENT INVITES + DIGITAL INTAKE (added 2026-11-10)
+// ============================================================
+var AAM_INTAKE_VERSION = 'intake-consent-v1-2026-11';
+
+// ---- Invite links: ?join=CODE&as=parent|athlete -------------
+var aamJoin = null;
+(function aamReadJoinLink() {
+  try {
+    var q = new URLSearchParams(window.location.search);
+    var code = (q.get('join') || '').trim().toLowerCase();
+    var as = (q.get('as') || '').trim().toLowerCase();
+    if (code && /^[a-z0-9]{6,20}$/.test(code) && (as === 'parent' || as === 'athlete')) {
+      aamJoin = { code: code, as: as };
+      sessionStorage.setItem('aamJoin', JSON.stringify(aamJoin));
+      history.replaceState(null, '', window.location.pathname);
+    } else {
+      var saved = sessionStorage.getItem('aamJoin');
+      if (saved) aamJoin = JSON.parse(saved);
+    }
+  } catch (e) { aamJoin = null; }
+})();
+
+function aamApplyJoinToGate() {
+  if (!aamJoin) return;
+  var who = aamJoin.as === 'parent' ? 'parent or guardian' : 'athlete';
+  var form = document.getElementById('gate-signup-form');
+  if (form && !document.getElementById('gate-join-banner')) {
+    var b = document.createElement('div');
+    b.id = 'gate-join-banner';
+    b.style.cssText = 'background:#1B2D4F;border-left:3px solid #C9A84C;color:#C8D1E3;font-size:13px;line-height:1.5;padding:10px 12px;margin-bottom:14px;text-align:left;border-radius:4px';
+    b.innerHTML = '<strong style="color:#C9A84C">You’ve been invited by Advanced Athletic Medicine.</strong><br>Create your ' + who + ' account below. Already have an account? Log in and it will be linked automatically.';
+    form.insertBefore(b, form.firstChild);
+  }
+  [['gate-signup-invite'], ['acct-signup-invite']].forEach(function(ids) {
+    var el = document.getElementById(ids[0]);
+    if (el && el.closest('.acct-field')) el.closest('.acct-field').style.display = 'none';
+  });
+  ['gate-signup-role', 'acct-signup-role'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (!sel) return;
+    if (!Array.prototype.some.call(sel.options, function(o) { return o.value === aamJoin.as; })) {
+      var o = document.createElement('option'); o.value = aamJoin.as; o.textContent = aamJoin.as === 'parent' ? 'Parent / Guardian' : 'Athlete'; sel.appendChild(o);
+    }
+    sel.value = aamJoin.as;
+    if (sel.closest('.acct-field')) sel.closest('.acct-field').style.display = 'none';
+  });
+  if (typeof gateSwitchTab === 'function') gateSwitchTab('signup');
+}
+document.addEventListener('DOMContentLoaded', aamApplyJoinToGate);
+
+// Called after any login: links an existing account opened from an invite link.
+async function aamClaimJoinIfAny() {
+  if (!aamJoin) return;
+  var sb = getSb(); if (!sb) return;
+  var fn = aamJoin.as === 'parent' ? 'claim_athlete_as_parent' : 'claim_athlete_as_self';
+  try { await sb.rpc(fn, { code: aamJoin.code }); } catch (e) {}
+  aamJoin = null; try { sessionStorage.removeItem('aamJoin'); } catch (e) {}
+}
+
+// ---- Small helpers ------------------------------------------
+function aamAgeFrom(dobStr) {
+  if (!dobStr) return null;
+  var d = new Date(dobStr + 'T00:00:00'); if (isNaN(d)) return null;
+  var t = new Date(); var a = t.getFullYear() - d.getFullYear();
+  if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) a--;
+  return a;
+}
+function aamFmtDate(iso) { if (!iso) return ''; var d = new Date(iso.length === 10 ? iso + 'T00:00:00' : iso); return isNaN(d) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+function aamShowPrint(content, title) {
+  if (typeof showPrintModal === 'function') return showPrintModal(content, title);
+  var m = document.getElementById('print-modal'), b = document.getElementById('print-modal-body'), t = document.getElementById('print-modal-title');
+  if (!m || !b) return; if (t) t.textContent = title || 'Preview'; b.innerHTML = content; m.classList.add('show'); m.scrollTop = 0;
+}
+function aamInviteUrl(code, as) { return window.location.origin + window.location.pathname + '?join=' + encodeURIComponent(code) + '&as=' + as; }
+
+// ---- Admin: AAM Clients ------------------------------------
+var aamClientsCache = [];
+async function aamAdminAddClient() {
+  var sb = getSb(); var msg = document.getElementById('aam-client-msg');
+  var name = (document.getElementById('aam-client-name').value || '').trim();
+  var dob = document.getElementById('aam-client-dob').value || null;
+  if (!name) { msg.textContent = 'Enter the client’s name.'; msg.style.display = 'block'; return; }
+  var res = await sb.rpc('aam_admin_add_client', { p_name: name, p_dob: dob });
+  if (res.error) { msg.textContent = 'Could not add client: ' + res.error.message; msg.style.display = 'block'; return; }
+  document.getElementById('aam-client-name').value = ''; document.getElementById('aam-client-dob').value = '';
+  msg.textContent = name + ' added. Send the invite links below.'; msg.style.display = 'block';
+  setTimeout(function() { msg.style.display = 'none'; }, 4000);
+  aamAdminLoadClients();
+}
+
+async function aamAdminLoadClients() {
+  var sb = getSb(); var box = document.getElementById('aam-client-list'); if (!box || !sb) return;
+  var res = await sb.rpc('aam_admin_list_clients');
+  if (res.error) { box.innerHTML = '<div class="tb-privacy-note">Could not load clients.</div>'; return; }
+  aamClientsCache = res.data || [];
+  if (!aamClientsCache.length) { box.innerHTML = '<div class="tb-privacy-note">No clients yet. Add your first client above.</div>'; return; }
+  box.innerHTML = aamClientsCache.map(function(c, i) {
+    var age = aamAgeFrom(c.dob);
+    var ageTxt = age === null ? 'DOB not entered' : (age < 18 ? 'Age ' + age + ' · minor' : 'Age ' + age + ' · adult');
+    var intake = c.intake_status === 'pending' ? '<span style="color:#B7791F;font-weight:700">Intake waiting for review</span>'
+               : c.intake_status === 'filed' ? '<span style="color:#2F7D4A;font-weight:700">Intake filed</span>'
+               : '<span style="color:#7A7A85">No intake yet</span>';
+    var linked = (c.athlete_linked ? 'Athlete account linked' : 'Athlete not signed up') + ' · ' + c.parents_linked + ' parent' + (c.parents_linked === 1 ? '' : 's') + ' linked';
+    return '<div class="acct-team-card" style="cursor:default;display:block">' +
+      '<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div class="acct-team-card-name">' + aamEsc(c.full_name) + '</div>' +
+      '<div class="acct-team-card-count">' + aamEsc(ageTxt) + ' · ' + aamEsc(linked) + '</div>' +
+      '<div class="acct-team-card-count" style="margin-top:2px">' + intake + '</div></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start">' +
+      '<button class="btn-secondary" style="padding:6px 10px;font-size:11px" onclick="aamShareInvite(' + i + ',\'parent\')">Parent invite</button>' +
+      '<button class="btn-secondary" style="padding:6px 10px;font-size:11px" onclick="aamShareInvite(' + i + ',\'athlete\')">Athlete invite</button>' +
+      '</div></div><div class="save-msg" id="aam-inv-msg-' + i + '" style="display:none"></div></div>';
+  }).join('');
+}
+
+async function aamShareInvite(i, as) {
+  var c = aamClientsCache[i]; if (!c) return;
+  var url = aamInviteUrl(c.join_code, as);
+  var who = as === 'parent' ? 'parent/guardian' : 'athlete';
+  var text = 'Advanced Athletic Medicine: set up your ' + who + ' account for ' + c.full_name + ' and complete the intake forms here: ';
+  var msg = document.getElementById('aam-inv-msg-' + i);
+  try {
+    if (navigator.share) { await navigator.share({ title: 'Advanced Athletic Medicine invite', text: text, url: url }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text + url); if (msg) { msg.textContent = 'Invite link copied. Paste it into a text or email.'; msg.style.display = 'block'; } }
+  catch (e) { if (msg) { msg.textContent = text + url; msg.style.display = 'block'; } }
+}
+
+// ---- Admin: intake inbox ------------------------------------
+var aamIntakeCache = [];
+async function aamAdminLoadIntakes() {
+  var sb = getSb(); var box = document.getElementById('aam-intake-list'); if (!box || !sb) return;
+  var res = await sb.from('intake_submissions').select('id, athlete_id, submitted_at, form_version, answers, signature, status, athletes(full_name)').eq('status', 'pending').order('submitted_at', { ascending: true });
+  if (res.error) { box.innerHTML = '<div class="tb-privacy-note">Could not load intake forms.</div>'; return; }
+  aamIntakeCache = res.data || [];
+  var badge = document.getElementById('aam-intake-count'); if (badge) badge.textContent = aamIntakeCache.length ? ' (' + aamIntakeCache.length + ')' : '';
+  if (!aamIntakeCache.length) { box.innerHTML = '<div class="tb-privacy-note">No intake forms waiting. New submissions show up here.</div>'; return; }
+  box.innerHTML = aamIntakeCache.map(function(s, i) {
+    var nm = (s.athletes && s.athletes.full_name) || (s.answers && s.answers.patient_name) || 'Client';
+    return '<div class="acct-team-card" style="cursor:default;display:block"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+      '<div><div class="acct-team-card-name">' + aamEsc(nm) + '</div><div class="acct-team-card-count">Submitted ' + aamEsc(aamFmtDate(s.submitted_at)) + ' by ' + aamEsc((s.signature && s.signature.signer_name) || '') + '</div></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn-primary" style="padding:8px 12px;font-size:12px" onclick="aamOpenIntakePdf(' + i + ')">Open PDF</button>' +
+      '<button class="btn-secondary" style="padding:8px 12px;font-size:12px" id="aam-file-btn-' + i + '" onclick="aamMarkFiled(' + i + ')">Mark as filed</button></div></div></div>';
+  }).join('');
+}
+
+function aamOpenIntakePdf(i) {
+  var s = aamIntakeCache[i]; if (!s) return;
+  window.aamPrintDate = (s.submitted_at || '').slice(0, 10);
+  aamShowPrint(aamIntakeDocHtml(s.answers || {}, s.signature || {}, s.submitted_at), 'Intake Form - ' + ((s.answers && s.answers.patient_name) || (s.athletes && s.athletes.full_name) || 'Client'));
+}
+
+async function aamMarkFiled(i) {
+  var s = aamIntakeCache[i]; var btn = document.getElementById('aam-file-btn-' + i); if (!s || !btn) return;
+  if (btn.dataset.confirm !== '1') {
+    btn.dataset.confirm = '1'; btn.textContent = 'Saved to OneDrive? Tap to confirm'; btn.style.background = '#FDF2F0'; btn.style.color = '#B23A2E';
+    setTimeout(function() { if (btn) { btn.dataset.confirm = ''; btn.textContent = 'Mark as filed'; btn.style.background = ''; btn.style.color = ''; } }, 6000);
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Filing...';
+  var res = await getSb().rpc('aam_mark_intake_filed', { p_id: s.id });
+  if (res.error || res.data !== 'ok') { btn.disabled = false; btn.textContent = 'Could not file. Try again.'; return; }
+  aamAdminLoadIntakes(); aamAdminLoadClients();
+}
+
+// ---- Consent text (Matt's forms, cleaned up) -----------------
+var AAM_CONSENT_ADULT = [
+  ['Consent to Receive Athletic Training Services', 'I consent to receive athletic training services, evaluation, treatment, and rehabilitation from Matthew Cannella, Certified Athletic Trainer, with Advanced Athletic Medicine, licensed in the State of Missouri.'],
+  ['1. Nature of Services', 'Athletic training services may include, but are not limited to: physical evaluation and assessment; injury prevention and risk reduction strategies; therapeutic exercises and rehabilitation programs; manual therapy and soft tissue techniques; use of modalities (ice, heat, electrical stimulation, ultrasound, etc.); and taping, bracing, and support techniques.'],
+  ['2. Voluntary Participation', 'My participation is voluntary, and I may refuse any treatment or stop participation at any time without penalty.'],
+  ['3. Assumption of Risk', 'The nature, purpose, and expected results of the proposed services have been explained to me. Although athletic training services are designed to reduce injury and improve function, there are inherent risks associated with athletic training interventions, physical activity, and treatment. These may include, but are not limited to, increased soreness, bruising, aggravation of symptoms or injury, or dizziness. I have had the opportunity to ask questions and have received satisfactory answers.'],
+  ['4. Communication with Supervising Medical Director', 'Matthew Cannella, ATC operates under a collaborative agreement with a licensed physician, Dr. J. Michael Smith, who may be consulted regarding my care.'],
+  ['5. Confidentiality', 'My personal health information will be kept confidential and will only be shared with other healthcare providers with my written permission, or as required by law.'],
+  ['6. Right to Refuse or Withdraw Consent', 'I may refuse any part of the treatment and may withdraw consent at any time without affecting my ability to receive care in the future.']
+];
+var AAM_CONSENT_MINOR = [
+  ['Consent to Treat a Minor', 'I am the parent or legal guardian of the athlete named on this form. I authorize Advanced Athletic Medicine and its providers to perform evaluation, treatment, and management of injuries or musculoskeletal conditions as necessary and appropriate. This includes, but is not limited to: physical assessments and injury evaluations; manual therapy techniques (e.g., joint mobilizations, soft tissue work, cupping); exercise prescription and rehabilitation programming; and use of modalities such as dry needling (only if separately consented to). Treatment will be administered by a certified and licensed Athletic Trainer, and I may revoke this consent at any time in writing.'],
+  ['Supervising Medical Director', 'Matthew Cannella, ATC operates under a collaborative agreement with a licensed physician, Dr. J. Michael Smith, who may be consulted regarding my child’s care.'],
+  ['Privacy and Confidentiality', 'My child’s health information will be handled confidentially and securely, and released only as necessary for treatment, with my written permission, or as required by law. This practice does not bill insurance and operates on a cash-based model.'],
+  ['Emergency Authorization', 'In the event of an emergency, I authorize Advanced Athletic Medicine to take appropriate steps to ensure my child receives necessary medical care. This may include calling emergency services or referring to an appropriate specialist.']
+];
+var AAM_INTAKE_ACK = 'I acknowledge that the information I have provided in this form is accurate and complete to the best of my knowledge. I understand that providing false or incomplete information may affect care and treatment. I authorize Advanced Athletic Medicine and its providers to perform evaluations, treatments, and procedures deemed necessary and appropriate. I acknowledge that I have had the opportunity to ask questions regarding care, that I may withdraw consent or refuse any treatment at any time, that certain treatments may carry inherent risks, and that no guarantee or assurance has been made as to the results of care.';
+var AAM_CONDITIONS = ['High blood pressure (hypertension)', 'High cholesterol', 'Heart disease (e.g., coronary artery disease, heart attack)', 'Heart murmur', 'Arrhythmia (irregular heartbeat)', 'Shortness of breath', 'Stroke or TIA', 'Chest pain', 'Fainting during exercise', 'Asthma', 'COPD', 'Diabetes (Type 1 or 2)', 'Thyroid problems', 'Epilepsy or seizures', 'Migraines', 'Multiple sclerosis', 'Parkinson’s disease', 'Dementia or Alzheimer’s', 'Concussions', 'Kidney disease', 'Urinary tract infections', 'Any history of cancer', 'Anemia', 'Clotting disorders', 'Sickle cell trait', 'Allergies (food, medication, environmental)', 'Autoimmune disease (e.g., lupus, rheumatoid arthritis)', 'Immunodeficiency', 'Tobacco use', 'None of the above'];
+
+// ---- Intake form (family side) -------------------------------
+var aamIntakeAthlete = null;
+function aamIntakeField(id, label, type, extra) {
+  type = type || 'text';
+  if (type === 'textarea') return '<div class="form-row"><label class="form-label" for="ik-' + id + '">' + label + '</label><textarea class="form-input" id="ik-' + id + '" rows="3" ' + (extra || '') + '></textarea></div>';
+  return '<div class="form-row"><label class="form-label" for="ik-' + id + '">' + label + '</label><input class="form-input" type="' + type + '" id="ik-' + id + '" ' + (extra || '') + '></div>';
+}
+function aamIntakeSelect(id, label, opts) {
+  return '<div class="form-row"><label class="form-label" for="ik-' + id + '">' + label + '</label><select class="form-input" id="ik-' + id + '"><option value="">Select…</option>' + opts.map(function(o) { return '<option>' + aamEsc(o) + '</option>'; }).join('') + '</select></div>';
+}
+
+function aamOpenIntake(athleteId, athleteName, role) {
+  aamIntakeAthlete = { id: athleteId, name: athleteName, role: role };
+  var m = document.getElementById('aam-intake-modal'); var body = document.getElementById('aam-intake-body');
+  var h = '';
+  h += '<div class="tb-privacy-note" style="margin-top:0">This takes about 10 minutes. ' + (role === 'parent' ? 'For athletes under 18, a parent or guardian completes and signs this form.' : 'Athletes 18 or older complete and sign their own form.') + ' Your answers go only to Advanced Athletic Medicine.</div>';
+  h += '<div class="h2">Athlete Information</div><div class="aam-ik-grid">';
+  h += aamIntakeField('patient_name', 'Athlete full name *', 'text', 'value="' + aamEsc(athleteName || '') + '"') + aamIntakeField('dob', 'Date of birth *', 'date', 'onchange="aamIntakeAgeChanged()"');
+  h += aamIntakeField('address', 'Home address') + aamIntakeField('city_state', 'City / State') + aamIntakeField('zip', 'Zip code', 'text', 'inputmode="numeric"');
+  h += aamIntakeField('phone', 'Phone', 'tel') + aamIntakeSelect('phone_type', 'Phone type', ['Mobile', 'Home', 'Work']) + aamIntakeField('email', 'Email', 'email');
+  h += aamIntakeField('sport', 'Sport(s)') + aamIntakeField('position', 'Position') + aamIntakeField('team', 'Team / School') + aamIntakeSelect('throwing_arm', 'Throwing arm', ['Right', 'Left', 'Both']);
+  h += '</div>';
+  h += '<div id="aam-ik-guardian"><div class="h2">Parent / Guardian</div><div class="aam-ik-grid">' + aamIntakeField('guardian_name', 'Parent/guardian name') + aamIntakeField('guardian_relationship', 'Relationship to athlete') + aamIntakeField('guardian_phone', 'Phone', 'tel') + aamIntakeField('guardian_email', 'Email', 'email') + aamIntakeField('guardian_address', 'Address (if different from athlete)') + '</div></div>';
+  h += '<div class="h2">Emergency Contact</div><div class="aam-ik-grid">' + aamIntakeField('emergency_name', 'Name *') + aamIntakeField('emergency_relationship', 'Relationship') + aamIntakeField('emergency_phone', 'Phone *', 'tel') + '</div>';
+  h += '<div class="h2">Health History</div>';
+  h += aamIntakeField('allergies', 'Known allergies', 'textarea') + aamIntakeField('conditions_text', 'Previous or current medical conditions', 'textarea') + aamIntakeField('medications', 'Current medications or supplements', 'textarea') + aamIntakeField('surgeries', 'Surgeries (what and when)', 'textarea');
+  h += '<div class="aam-ik-grid">' + aamIntakeSelect('pcp', 'Primary care provider?', ['Yes', 'No']) + aamIntakeField('pcp_name', 'PCP name') + aamIntakeField('pcp_phone', 'PCP phone', 'tel') + '</div>';
+  h += aamIntakeField('prior_injuries', 'Previous injuries to a bone, joint, ligament or muscle', 'textarea') + aamIntakeField('concussion_history', 'History of concussions or other neurological disorders', 'textarea') + aamIntakeField('imaging', 'Previous imaging (X-ray, MRI, CT, ultrasound, etc.): where, what kind, and what for', 'textarea') + aamIntakeField('activity_level', 'Current activity level: how often do you train and what do you do?', 'textarea');
+  h += '<div class="form-row"><label class="form-label">Current or past conditions (check all that apply)</label><div class="aam-ik-checks">' + AAM_CONDITIONS.map(function(c, i) { return '<label><input type="checkbox" class="ik-cond" value="' + aamEsc(c) + '"> ' + aamEsc(c) + '</label>'; }).join('') + '</div></div>';
+  h += aamIntakeField('conditions_other', 'Other (please describe)', 'text');
+  h += '<div class="h2">Reason for Visit</div>';
+  h += aamIntakeField('complaint', 'Injury or concern to be evaluated or treated *', 'textarea') + aamIntakeField('duration', 'How long has this been going on?') + aamIntakeField('mechanism', 'Was there a specific mechanism of injury?', 'textarea') + aamIntakeField('seen_provider', 'Have you seen a physician or other provider for this?', 'textarea') + aamIntakeField('additional', 'Anything else you would like us to know?', 'textarea');
+  h += aamIntakeSelect('referral_source', 'How did you hear about us?', ['Marek Baseball Academy', 'Coach or team', 'Another parent or athlete', 'Social media', 'Web search', 'Physician or other provider', 'Other']);
+  h += '<div class="h2">Consent and Signature</div><div id="aam-ik-consent" class="aam-ik-consent"></div>';
+  h += '<label class="aam-ik-agree"><input type="checkbox" id="ik-agree-consent"> I have read and agree to the consent above.</label>';
+  h += '<label class="aam-ik-agree"><input type="checkbox" id="ik-agree-ack"> <span>' + aamEsc(AAM_INTAKE_ACK) + '</span></label>';
+  h += '<div class="aam-ik-grid">' + aamIntakeField('signer_name', 'Signer full name *') + aamIntakeField('signer_relationship', 'Relationship to athlete', 'text', role === 'athlete' ? 'value="Self"' : '') + '</div>';
+  h += '<div class="form-row"><label class="form-label">Signature * <span style="text-transform:none;letter-spacing:0;font-weight:400">(sign with your finger or mouse)</span></label><canvas id="aam-sig-pad" class="aam-sig-pad" width="600" height="180"></canvas><button type="button" class="btn-secondary" style="padding:6px 12px;font-size:11px;margin-top:6px" onclick="aamSigClear()">Clear signature</button></div>';
+  h += '<div class="save-msg" id="aam-ik-err" style="display:none;background:#FDF2F0;color:#B23A2E"></div>';
+  h += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 8px"><button class="btn-primary" id="aam-ik-submit" onclick="aamSubmitIntake()">Submit to Advanced Athletic Medicine</button><button class="btn-secondary" onclick="aamCloseIntake()">Save for later</button></div>';
+  body.innerHTML = h;
+  aamIntakeAgeChanged();
+  m.style.display = 'block'; m.scrollTop = 0; document.body.style.overflow = 'hidden';
+  aamSigInit();
+}
+function aamCloseIntake() { var m = document.getElementById('aam-intake-modal'); if (m) m.style.display = 'none'; document.body.style.overflow = ''; }
+
+function aamIntakeAgeChanged() {
+  var age = aamAgeFrom((document.getElementById('ik-dob') || {}).value);
+  var minor = age === null ? (aamIntakeAthlete && aamIntakeAthlete.role === 'parent') : age < 18;
+  var g = document.getElementById('aam-ik-guardian'); if (g) g.style.display = minor ? 'block' : 'none';
+  var c = document.getElementById('aam-ik-consent'); if (!c) return;
+  var sections = minor ? AAM_CONSENT_MINOR : AAM_CONSENT_ADULT;
+  c.innerHTML = '<div class="aam-ik-consent-title">' + (minor ? 'Minor Consent to Treat' : 'Medical Consent to Treat') + ' · Advanced Athletic Medicine</div>' + sections.map(function(s) { return '<p><strong>' + aamEsc(s[0]) + '.</strong> ' + aamEsc(s[1]) + '</p>'; }).join('');
+}
+
+// Signature pad
+var aamSigDrawn = false;
+function aamSigInit() {
+  var c = document.getElementById('aam-sig-pad'); if (!c) return; aamSigDrawn = false;
+  var ctx = c.getContext('2d'); ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#0F1E35';
+  var drawing = false;
+  function pos(e) { var r = c.getBoundingClientRect(); return { x: (e.clientX - r.left) * (c.width / r.width), y: (e.clientY - r.top) * (c.height / r.height) }; }
+  c.onpointerdown = function(e) { drawing = true; c.setPointerCapture(e.pointerId); var p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); e.preventDefault(); };
+  c.onpointermove = function(e) { if (!drawing) return; var p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); aamSigDrawn = true; e.preventDefault(); };
+  c.onpointerup = c.onpointercancel = function() { drawing = false; };
+}
+function aamSigClear() { var c = document.getElementById('aam-sig-pad'); if (!c) return; c.getContext('2d').clearRect(0, 0, c.width, c.height); aamSigDrawn = false; }
+
+function aamCollectIntake() {
+  var a = {};
+  ['patient_name', 'dob', 'address', 'city_state', 'zip', 'phone', 'phone_type', 'email', 'sport', 'position', 'team', 'throwing_arm', 'guardian_name', 'guardian_relationship', 'guardian_phone', 'guardian_email', 'guardian_address', 'emergency_name', 'emergency_relationship', 'emergency_phone', 'allergies', 'conditions_text', 'medications', 'surgeries', 'pcp', 'pcp_name', 'pcp_phone', 'prior_injuries', 'concussion_history', 'imaging', 'activity_level', 'conditions_other', 'complaint', 'duration', 'mechanism', 'seen_provider', 'additional', 'referral_source'].forEach(function(k) {
+    var el = document.getElementById('ik-' + k); a[k] = el ? (el.value || '').trim() : '';
+  });
+  a.conditions = Array.prototype.map.call(document.querySelectorAll('.ik-cond:checked'), function(x) { return x.value; });
+  var age = aamAgeFrom(a.dob); a.minor = age !== null && age < 18;
+  if (!a.minor) { ['guardian_name', 'guardian_relationship', 'guardian_phone', 'guardian_email', 'guardian_address'].forEach(function(k) { a[k] = ''; }); }
+  return a;
+}
+
+async function aamSubmitIntake() {
+  var err = document.getElementById('aam-ik-err'); var btn = document.getElementById('aam-ik-submit');
+  function fail(t) { err.textContent = t; err.style.display = 'block'; err.scrollIntoView({ block: 'center' }); }
+  err.style.display = 'none';
+  var a = aamCollectIntake();
+  if (!a.patient_name || !a.dob) return fail('Enter the athlete’s name and date of birth.');
+  if (!a.emergency_name || !a.emergency_phone) return fail('Enter an emergency contact name and phone number.');
+  if (!a.complaint) return fail('Describe the injury or concern you want evaluated.');
+  if (a.minor && aamIntakeAthlete.role !== 'parent') return fail('Athletes under 18 need a parent or guardian to complete and sign this form. Ask your parent to open their invite link.');
+  if (!a.minor && aamIntakeAthlete.role === 'parent') return fail('Athletes 18 or older complete and sign their own intake. Ask the athlete to open their invite link.');
+  if (!document.getElementById('ik-agree-consent').checked || !document.getElementById('ik-agree-ack').checked) return fail('Check both boxes to agree to the consent and acknowledgement.');
+  var signer = (document.getElementById('ik-signer_name').value || '').trim();
+  var rel = (document.getElementById('ik-signer_relationship').value || '').trim();
+  if (!signer) return fail('Type the signer’s full name.');
+  if (a.minor && !rel) return fail('Enter your relationship to the athlete.');
+  if (!aamSigDrawn) return fail('Please sign in the signature box.');
+  var sig = { signer_name: signer, relationship: rel || 'Self', patient_name: a.patient_name, signed_at: new Date().toISOString(),
+              consent_form: a.minor ? 'Minor Consent to Treat' : 'Medical Consent to Treat', consent_text_version: AAM_INTAKE_VERSION,
+              signature_png: document.getElementById('aam-sig-pad').toDataURL('image/png') };
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  var res = await getSb().rpc('aam_submit_intake', { p_athlete: aamIntakeAthlete.id, p_answers: a, p_signature: sig, p_form_version: AAM_INTAKE_VERSION });
+  btn.disabled = false; btn.textContent = 'Submit to Advanced Athletic Medicine';
+  if (res.error) return fail('Could not submit: ' + res.error.message);
+  if (res.data !== 'ok') return fail(String(res.data).replace(/^error:\s*/, ''));
+  window.aamLastIntake = { a: a, sig: sig };
+  document.getElementById('aam-intake-body').innerHTML = '<div class="h2" style="margin-top:0">Thank you — your forms were submitted.</div><p style="font-size:14px;line-height:1.6;color:#4A4A52">Advanced Athletic Medicine has received your intake and signed consent. Save a copy for your records.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><button class="btn-primary" onclick="aamPrintMyIntakeCopy()">Save my copy (PDF)</button><button class="btn-secondary" onclick="aamCloseIntake();acctLoadLinkedAthletes()">Done</button></div><div style="margin-top:22px"><a class="aam-book-btn" href="' + AAM_BOOKING_URL + '" target="_blank" rel="noopener" onclick="aamTrackBook(\'intake\')">Book your appointment</a></div>';
+}
+function aamPrintMyIntakeCopy() {
+  var x = window.aamLastIntake; if (!x) return;
+  window.aamPrintDate = aamTodayIso();
+  aamCloseIntake();
+  aamShowPrint(aamIntakeDocHtml(x.a, x.sig, new Date().toISOString()), 'Intake Form - ' + x.a.patient_name);
+}
+
+// Printable intake + consent document (used for Matt's OneDrive copy and the family's copy)
+function aamIntakeDocHtml(a, sig, submittedAt) {
+  var e = aamEsc; var minor = !!a.minor;
+  var css = '<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;font-size:11px;color:#1C1C1E;padding:16px}' +
+    '.hdr{background:#0F1E35;color:#fff;padding:14px 18px;margin-bottom:12px;border-bottom:3px solid #C9A84C}.hdr-sub{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;margin-bottom:4px}.hdr-title{font-size:17px;font-weight:700}.hdr-meta{font-size:10px;color:#7A9AB5;margin-top:2px}' +
+    '.sec{margin-bottom:10px;page-break-inside:avoid}.sec-title{background:#1A2F4E;color:#C9A84C;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 9px;margin-bottom:6px}' +
+    '.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.ii{background:#F5F4F0;padding:6px 8px;border-radius:2px}.il{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#7A7A85;margin-bottom:1px}.iv{font-size:11px;font-weight:700;color:#0F1E35;white-space:pre-wrap}' +
+    '.nar{background:#F5F4F0;padding:6px 8px;margin-bottom:5px}.nar .il{margin-bottom:2px}.nar .iv{font-weight:400}.cons p{margin:0 0 5px;line-height:1.45}.sig img{height:60px;border-bottom:1px solid #1C1C1E;display:block;margin:6px 0 2px}' +
+    '.ft{margin-top:12px;padding-top:8px;border-top:1px solid #E8E4DC;font-size:9px;color:#7A7A85}@media print{.hdr,.ii,.sec-title,.nar{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style>';
+  function ii(l, v) { return '<div class="ii"><div class="il">' + e(l) + '</div><div class="iv">' + e(v || '—') + '</div></div>'; }
+  function nar(l, v) { return '<div class="nar"><div class="il">' + e(l) + '</div><div class="iv">' + e(v || '—') + '</div></div>'; }
+  var b = '<div class="hdr"><div class="hdr-sub">Advanced Athletic Medicine</div><div class="hdr-title">New Patient Intake &amp; ' + (minor ? 'Minor Consent to Treat' : 'Consent to Treat') + '</div><div class="hdr-meta">' + e(a.patient_name) + ' · Submitted ' + e(aamFmtDate(submittedAt)) + '</div></div>';
+  b += '<div class="sec"><div class="sec-title">Athlete</div><div class="ig">' + ii('Name', a.patient_name) + ii('Date of Birth', aamFmtDate(a.dob)) + ii('Age', String(aamAgeFrom(a.dob))) + ii('Phone', (a.phone || '') + (a.phone_type ? ' (' + a.phone_type + ')' : '')) + ii('Email', a.email) + ii('Address', [a.address, a.city_state, a.zip].filter(Boolean).join(', ')) + ii('Sport', a.sport) + ii('Position', a.position) + ii('Team / School', a.team) + ii('Throwing Arm', a.throwing_arm) + ii('Referral Source', a.referral_source) + '</div></div>';
+  if (minor) b += '<div class="sec"><div class="sec-title">Parent / Guardian</div><div class="ig">' + ii('Name', a.guardian_name) + ii('Relationship', a.guardian_relationship) + ii('Phone', a.guardian_phone) + ii('Email', a.guardian_email) + ii('Address', a.guardian_address || 'Same as athlete') + '</div></div>';
+  b += '<div class="sec"><div class="sec-title">Emergency Contact</div><div class="ig">' + ii('Name', a.emergency_name) + ii('Relationship', a.emergency_relationship) + ii('Phone', a.emergency_phone) + '</div></div>';
+  b += '<div class="sec"><div class="sec-title">Reason for Visit</div>' + nar('Injury or concern', a.complaint) + nar('Duration', a.duration) + nar('Mechanism of injury', a.mechanism) + nar('Seen by a physician or other provider', a.seen_provider) + nar('Additional information', a.additional) + '</div>';
+  b += '<div class="sec"><div class="sec-title">Health History</div>' + nar('Allergies', a.allergies) + nar('Medical conditions', a.conditions_text) + nar('Checked conditions', (a.conditions || []).join(', ') + (a.conditions_other ? (a.conditions && a.conditions.length ? '; ' : '') + 'Other: ' + a.conditions_other : '')) + nar('Medications / supplements', a.medications) + nar('Surgeries', a.surgeries) + nar('Primary care provider', [a.pcp, a.pcp_name, a.pcp_phone].filter(Boolean).join(' · ')) + nar('Previous injuries', a.prior_injuries) + nar('Concussion / neurological history', a.concussion_history) + nar('Imaging', a.imaging) + nar('Activity level', a.activity_level) + '</div>';
+  var cons = minor ? AAM_CONSENT_MINOR : AAM_CONSENT_ADULT;
+  b += '<div class="sec cons"><div class="sec-title">' + e(sig.consent_form || (minor ? 'Minor Consent to Treat' : 'Medical Consent to Treat')) + '</div>' + cons.map(function(s) { return '<p><strong>' + e(s[0]) + '.</strong> ' + e(s[1]) + '</p>'; }).join('') + '<p><strong>Acknowledgement.</strong> ' + e(AAM_INTAKE_ACK) + '</p></div>';
+  b += '<div class="sec sig"><div class="sec-title">Signature</div>' + (sig.signature_png ? '<img src="' + e(sig.signature_png) + '" alt="Signature">' : '<div style="height:40px"></div>') +
+       '<div><strong>' + e(sig.signer_name) + '</strong>' + (sig.relationship ? ' · ' + e(sig.relationship) : '') + ' · Signed electronically ' + e(sig.signed_at ? new Date(sig.signed_at).toLocaleString('en-US') : '') + '</div></div>';
+  b += '<div class="ft">Advanced Athletic Medicine · Matthew Cannella, MBA, MS, LAT, ATC · 8911 US-59, St. Joseph, MO 64504 · Form ' + e(sig.consent_text_version || AAM_INTAKE_VERSION) + ' · Confidential</div>';
+  return css + b;
+}
+
+// ---- Family account: intake cards + adult sharing toggle -----
+async function aamRenderIntakeCards(athletes, role) {
+  var box = document.getElementById('aam-intake-cards'); if (!box) return;
+  box.innerHTML = '';
+  var sb = getSb();
+  for (var i = 0; i < athletes.length; i++) {
+    var a = athletes[i];
+    var st = await sb.rpc('aam_intake_status', { p_athlete: a.id });
+    var s = (st.data || {});
+    var card = document.createElement('div');
+    card.className = 'aam-book-cta';
+    if (s.status === 'none') {
+      var athleteMinorKnown = role === 'athlete' && s.dob_known && s.minor;
+      card.innerHTML = '<h3>New client paperwork for ' + aamEsc(a.full_name) + '</h3><p>Complete the intake and consent to treat before your first visit. ' + (athleteMinorKnown ? 'Because you are under 18, a parent or guardian needs to complete this from their account.' : 'It takes about 10 minutes.') + '</p>' +
+        (!athleteMinorKnown ? '<button class="aam-book-btn" data-id="' + aamEsc(a.id) + '" data-name="' + aamEsc(a.full_name) + '">Start intake forms</button>' : '');
+      var b = card.querySelector('button'); if (b) b.onclick = function() { aamOpenIntake(this.getAttribute('data-id'), this.getAttribute('data-name'), role); };
+    } else {
+      card.innerHTML = '<h3>Paperwork complete for ' + aamEsc(a.full_name) + '</h3><p>Intake and consent received ' + aamEsc(aamFmtDate(s.submitted_at)) + '. Thank you.</p><a class="aam-book-btn" href="' + AAM_BOOKING_URL + '" target="_blank" rel="noopener" onclick="aamTrackBook(\'account\')">Book an appointment</a>';
+    }
+    box.appendChild(card);
+    if (role === 'athlete' && s.dob_known && !s.minor) {
+      var sh = document.createElement('div'); sh.className = 'tool-form';
+      sh.innerHTML = '<label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.5"><input type="checkbox" id="aam-share-' + i + '" style="width:18px;height:18px;margin-top:2px;accent-color:#C9A84C"' + (a.parent_access ? ' checked' : '') + '> <span><strong>Share my program and records with my parent/guardian.</strong> Because you are 18 or older, your parent can only see your information if you allow it. You can turn this off anytime.</span></label><div class="save-msg" id="aam-share-msg-' + i + '" style="display:none"></div>';
+      box.appendChild(sh);
+      (function(idx, athleteId) {
+        document.getElementById('aam-share-' + idx).onchange = async function() {
+          var r = await sb.rpc('aam_set_parent_access', { p_athlete: athleteId, p_allowed: this.checked });
+          var m = document.getElementById('aam-share-msg-' + idx);
+          m.textContent = (r.data === 'ok') ? (this.checked ? 'Your parent can now see your program.' : 'Sharing turned off.') : 'Could not save. Try again.';
+          m.style.display = 'block'; setTimeout(function() { m.style.display = 'none'; }, 3000);
+        };
+      })(i, a.id);
+    }
+  }
+}
 
 // Runs after the full script loads so Supabase config (SB_CDN_URLS etc.) is defined first.
 window.addEventListener('DOMContentLoaded', async function gateAutoCheck() {
@@ -3387,7 +3783,7 @@ async function acctSignUp() {
   var role = document.getElementById('acct-signup-role').value;
   var invite = document.getElementById('acct-signup-invite').value.trim().toUpperCase();
   if (!name || !email || !password) { acctShowMsg('Fill in your name, email, and password.', 'error'); return; }
-  if (!invite) { acctShowMsg('Enter your invite code.', 'error'); return; }
+  if (!invite && !aamJoin) { acctShowMsg('Enter your invite code.', 'error'); return; }
   if (password.length < 6) { acctShowMsg('Password must be at least 6 characters.', 'error'); return; }
 
   var btn = document.getElementById('acct-signup-btn');
@@ -3397,13 +3793,15 @@ async function acctSignUp() {
   btn.disabled = false; btn.textContent = 'Create Account';
   if (!sb) { acctShowMsg('Could not connect to the account system. Check your internet connection and try again.', 'error'); return; }
 
-  var codeRes = await sb.rpc('aam_check_invite', { p_code: invite });
-  if (codeRes.error || codeRes.data !== true) { acctShowMsg('Invalid invite code. Check with your coach or AAM staff for the current code.', 'error'); return; }
+  if (!aamJoin) {
+    var codeRes = await sb.rpc('aam_check_invite', { p_code: invite });
+    if (codeRes.error || codeRes.data !== true) { acctShowMsg('Invalid invite code. Check with your coach or AAM staff for the current code.', 'error'); return; }
+  }
 
   var res = await sb.auth.signUp({
     email: email,
     password: password,
-    options: { data: { full_name: name, role: role, invite_code: invite } }
+    options: { data: aamJoin ? { full_name: name, role: aamJoin.as, join_code: aamJoin.code, join_as: aamJoin.as } : { full_name: name, role: role, invite_code: invite } }
   });
   if (res.error) { acctShowMsg(res.error.message, 'error'); return; }
   acctShowMsg('Account created! Check your email to confirm, then log in.', 'success');
@@ -3472,7 +3870,7 @@ function acctRenderLoggedIn(user) {
   });
   var navItem = document.getElementById('nav-account-item');
   if (navItem) navItem.textContent = name;
-  aamLoadProtected().then(function(acc) { aamRenderAccountPanels(user, acc); });
+  aamClaimJoinIfAny().then(function() { return aamLoadProtected(); }).then(function(acc) { aamRenderAccountPanels(user, acc); });
 }
 
 function aamRenderAccountPanels(user, acc) {
@@ -3507,7 +3905,7 @@ function aamRenderAccountPanels(user, acc) {
   document.getElementById('acct-coach-panel').style.display = (active && (role === 'coach' || acc.is_admin)) ? 'block' : 'none';
   document.getElementById('acct-joincode-panel').style.display = (active && (role === 'athlete' || role === 'parent')) ? 'block' : 'none';
 
-  if (acc.is_admin) { acctLoadAdminOverview(); aamAdminLoadMembers(); }
+  if (acc.is_admin) { acctLoadAdminOverview(); aamAdminLoadMembers(); aamAdminLoadClients(); aamAdminLoadIntakes(); }
   if (active && (role === 'coach' || acc.is_admin)) acctLoadTeamList();
   else if (active && (role === 'athlete' || role === 'parent')) acctLoadLinkedAthletes();
 }
@@ -3683,18 +4081,27 @@ async function acctLoadLinkedAthletes() {
   var planView = document.getElementById('acct-weekly-plan-view');
   var res;
   if (role === 'athlete') {
-    res = await sb.from('athletes').select('id, full_name').eq('athlete_user_id', user.id);
+    res = await sb.from('athletes').select('id, full_name, parent_access').eq('athlete_user_id', user.id);
   } else {
     res = await sb.from('athlete_parents').select('athletes(id, full_name)').eq('parent_user_id', user.id);
   }
+  var intakeBox = document.getElementById('aam-intake-cards');
   if (res.error || !res.data || !res.data.length) {
     list.innerHTML = '<div style="color:#7A7A85;font-size:13px">Not linked to any athlete yet. Enter your code above.</div>';
     if (planView) planView.innerHTML = '';
+    if (intakeBox) intakeBox.innerHTML = '';
     return;
   }
   var athletes = res.data.map(function(row) {
     return role === 'athlete' ? row : row.athletes;
   }).filter(Boolean);
+  if (!athletes.length) {
+    list.innerHTML = '<div style="color:#7A7A85;font-size:13px">Your account is linked. Because the athlete is 18 or older, they control whether you can see their program. Ask them to turn on sharing in their account.</div>';
+    if (planView) planView.innerHTML = '';
+    if (intakeBox) intakeBox.innerHTML = '';
+    return;
+  }
+  aamRenderIntakeCards(athletes, role);
 
   list.innerHTML = athletes.map(function(a) {
     return '<div class="acct-linked-card">Linked to <strong>' + aamEsc(a.full_name) + '</strong></div>';
@@ -3755,5 +4162,9 @@ async function acctCheckSession() {
 }
 
 </script>
+<div id="aam-intake-modal" role="dialog" aria-modal="true" aria-label="Intake forms" style="display:none">
+  <div class="aam-ik-bar"><span>Advanced Athletic Medicine &middot; Intake &amp; Consent</span><button onclick="aamCloseIntake()" aria-label="Close">&times;</button></div>
+  <div id="aam-intake-body" class="aam-ik-body"></div>
+</div>
 </body>
 </html>
