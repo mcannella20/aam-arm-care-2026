@@ -460,7 +460,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 .aam-book-cta p { color:#C8D1E3; font-size:13px; line-height:1.5; margin:0 0 12px; }
 .aam-book-cta .aam-cred { color:#7A9AB5; font-size:11px; margin:10px 0 0; }
 #pm-client { background:#1B2D4F; border:1px solid #2A4A6A; color:#fff; border-radius:4px; padding:6px 8px; font-size:12px; width:180px; }
-#aam-intake-modal { position:fixed; inset:0; background:#F7F6F2; z-index:9000; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+#aam-intake-modal { position:fixed; inset:0; background:#F7F6F2; color:#1C1C1E; z-index:9000; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 .aam-ik-bar { position:sticky; top:0; background:#0F1E35; color:#C9A84C; font-weight:700; font-size:13px; letter-spacing:.5px; padding:12px 18px; display:flex; justify-content:space-between; align-items:center; z-index:2; border-bottom:3px solid #C9A84C; }
 .aam-ik-bar button { background:none; border:none; color:#fff; font-size:26px; line-height:1; cursor:pointer; padding:0 4px; }
 .aam-ik-body { max-width:760px; margin:0 auto; padding:18px 18px 60px; }
@@ -473,6 +473,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
 .aam-ik-consent-title { font-weight:700; color:#0F1E35; margin-bottom:8px; }
 .aam-ik-agree { display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:1.5; margin:0 0 12px; color:#2A2A30; }
 .aam-sig-pad { width:100%; max-width:600px; height:auto; aspect-ratio:600/180; background:#fff; border:1px dashed #9AA3B5; border-radius:6px; touch-action:none; display:block; }
+#print-modal-body { color:#1C1C1E; }
 #print-modal { display:none; position:fixed; inset:0; background:#fff; z-index:900; overflow-y:auto; }
 #print-modal.show { display:block; }
 .print-modal-bar { background:#0F1E35; padding:12px 20px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; gap:12px; }
@@ -648,7 +649,7 @@ body { font-family: Arial, sans-serif; background: #0F1E35; color: #fff; }
     <div class="print-modal-btns">
       <input id="pm-client" type="text" placeholder="Client name (for file name)" aria-label="Client name for the PDF file name">
       <button class="pm-print-btn" onclick="aamPrintPdf()">Print / Save PDF</button>
-      <button class="pm-close-btn" onclick="closePrintModal()">&#10005; Close</button>
+      <button class="pm-close-btn" onclick="aamClosePrintModal()">&#10005; Close</button>
     </div>
   </div>
   <div id="print-modal-body"></div>
@@ -2443,6 +2444,14 @@ async function aamRenderIntakeCards(athletes, role) {
   }
 }
 
+// Close the PDF preview. Works for everyone (the clinical tools' version only loads for staff).
+function aamClosePrintModal() {
+  var m = document.getElementById('print-modal'); var b = document.getElementById('print-modal-body');
+  if (m) m.classList.remove('show');
+  if (b) b.innerHTML = '';
+  document.body.style.overflow = '';
+}
+if (typeof window.closePrintModal !== 'function') { window.closePrintModal = aamClosePrintModal; }
 // Runs after the full script loads so Supabase config (SB_CDN_URLS etc.) is defined first.
 window.addEventListener('DOMContentLoaded', async function gateAutoCheck() {
   var ok = await ensureSupabaseLoaded();
